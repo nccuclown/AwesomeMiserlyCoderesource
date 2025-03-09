@@ -1,0 +1,143 @@
+GPT-4o mini API 基本使用指南
+以下是在您的品牌受眾分析工具中整合 GPT-4o mini 的基本方法：
+1. 安裝必要套件
+首先，安裝 OpenAI 的官方 Node.js 套件：
+bashCopynpm install openai
+2. 環境變數設置
+在 Replit 環境中，使用 Secrets 功能設置 API 金鑰：
+
+點擊左側工具欄中的 "Secrets" (鎖的圖示)
+添加金鑰: OPENAI_API_KEY，值為您的 OpenAI API 金鑰
+
+3. 基本 API 使用範例
+後端實現 (Node.js)
+javascriptCopy// server/services/openaiService.js
+const { OpenAI } = require('openai');
+require('dotenv').config();
+
+// 初始化 OpenAI 客戶端
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+// 使用 GPT-4o mini 分析品牌資訊
+async function analyzeBrandInfo(brandInfo) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",  // 使用 GPT-4o mini 模型
+      messages: [
+        {
+          role: "system",
+          content: "你是一位專業的品牌分析師，請根據提供的品牌資訊進行分析。分析結果請以JSON格式返回，包含行業類別、目標受眾和品牌特性。"
+        },
+        {
+          role: "user",
+          content: `品牌名稱: ${brandInfo.brandName}\n品牌簡介: ${brandInfo.brandDescription}\n產品資訊: ${brandInfo.productInfo}`
+        }
+      ],
+      temperature: 0.3,  // 較低的溫度使結果更確定性
+      response_format: { type: "json_object" }  // 指定回傳 JSON 格式
+    });
+
+    return JSON.parse(response.choices[0].message.content);
+  } catch (error) {
+    console.error("OpenAI API 錯誤:", error);
+    throw new Error(`分析品牌資訊時發生錯誤: ${error.message}`);
+  }
+}
+
+// 生成受眾分析報告
+async function generateAudienceReport(brandAnalysis, audienceData) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "你是一位專業的受眾分析專家，請根據提供的品牌分析和受眾數據生成深入的分析報告。"
+        },
+        {
+          role: "user",
+          content: `品牌分析: ${JSON.stringify(brandAnalysis)}\n受眾數據: ${JSON.stringify(audienceData)}`
+        }
+      ],
+      temperature: 0.5,
+      max_tokens: 1000  // 控制回應長度
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("OpenAI API 錯誤:", error);
+    throw new Error(`生成報告時發生錯誤: ${error.message}`);
+  }
+}
+
+module.exports = {
+  analyzeBrandInfo,
+  generateAudienceReport
+};
+前端調用 API (React)
+javascriptCopy// src/services/api.js
+import axios from 'axios';
+
+// 品牌分析 API
+export const analyzeBrand = async (brandInfo) => {
+  try {
+    const response = await axios.post('/api/analyze/brand', brandInfo);
+    return response.data;
+  } catch (error) {
+    console.error('分析請求錯誤:', error);
+    throw error;
+  }
+};
+
+// 受眾報告 API
+export const generateReport = async (brandAnalysis, audienceData) => {
+  try {
+    const response = await axios.post('/api/analyze/report', {
+      brandAnalysis,
+      audienceData
+    });
+    return response.data;
+  } catch (error) {
+    console.error('報告生成錯誤:', error);
+    throw error;
+  }
+};
+4. 重要參數說明
+GPT-4o mini 的重要參數：
+
+model: 使用 "gpt-4o-mini" 作為模型名稱
+temperature: 控制創造性程度 (0-1)
+
+低溫度 (0.1-0.3): 更確定性的回應，適合資料分析
+高溫度 (0.7-0.9): 更創意的回應，適合創意內容
+
+
+max_tokens: 限制回應的最大長度
+response_format: 指定回應格式，如 JSON
+
+5. 錯誤處理建議
+javascriptCopytry {
+  const result = await analyzeBrandInfo(brandData);
+  // 處理成功結果
+} catch (error) {
+  if (error.status === 429) {
+    // 處理速率限制錯誤
+    console.error("API 請求次數已達上限，請稍後再試");
+  } else if (error.status === 401) {
+    // 處理認證錯誤
+    console.error("API 金鑰無效或已過期");
+  } else {
+    // 處理其他錯誤
+    console.error("發生錯誤:", error.message);
+  }
+}
+6. API 金鑰安全性提示
+
+永遠不要在前端代碼中直接包含 API 金鑰
+使用環境變數存儲 API 金鑰
+在後端進行所有 API 調用
+考慮實現 API 使用量監控和限制
+
+這個基本設置應該能讓您在第一階段和第二階段開發中有效地整合 GPT-4o mini，隨著專案的發展，您可以進一步優化提示詞和參數設置以獲得更好的結果。Retry
