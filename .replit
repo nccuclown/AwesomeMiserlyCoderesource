@@ -1,4 +1,4 @@
-run = "npm run dev"
+run = "npm run dev & node server.js"
 modules = ["nodejs-20"]
 hidden = [".config", "package-lock.json"]
 entrypoint = "index.html"
@@ -13,11 +13,15 @@ language = "nodejs"
 deploymentTarget = "static"
 build = ["sh", "-c", "npm run build"]
 publicDir = "dist"
-run = ["sh", "-c", "npm run start"]
+run = ["sh", "-c", "node server.js"]
 
 [[ports]]
 localPort = 5173
 externalPort = 80
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
 
 [workflows]
 runButton = "Start Dev Server"
@@ -28,4 +32,4 @@ author = 39030242
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm install && npm run dev"
+args = "npm install && (npm run dev & node server.js)"
