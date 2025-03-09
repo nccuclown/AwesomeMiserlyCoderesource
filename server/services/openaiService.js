@@ -1,4 +1,3 @@
-
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 
@@ -21,32 +20,68 @@ async function getAIAnalysis(
   timeSeriesData,
   productPreferenceData
 ) {
+  console.log("[檢查點] OpenAI API 請求數據準備開始");
+  console.log(`[檢查點] 品牌名稱: ${brandName}`);
+  console.log(`[檢查點] 品牌描述: ${brandDescription}`);
+
+  // 驗證性別數據
+  if (genderDistribution && genderDistribution.data) {
+    console.log(`[檢查點] 性別數據: ${genderDistribution.data.length} 項`);
+    console.log(`[檢查點] 性別數據樣本: ${JSON.stringify(genderDistribution.data.slice(0, 2))}`);
+  } else {
+    console.log(`[檢查點] 警告: 性別數據為空或格式不正確`);
+  }
+
+  // 驗證年齡數據
+  if (ageDistribution && ageDistribution.data) {
+    console.log(`[檢查點] 年齡數據: ${ageDistribution.data.length} 項`);
+    console.log(`[檢查點] 年齡數據樣本: ${JSON.stringify(ageDistribution.data.slice(0, 2))}`);
+  } else {
+    console.log(`[檢查點] 警告: 年齡數據為空或格式不正確`);
+  }
+
+  // 驗證其他選填數據
+  if (timeSeriesData) {
+    console.log(`[檢查點] 時間序列數據存在`);
+    if (timeSeriesData.gender) {
+      console.log(`[檢查點] 性別時間序列數據: ${timeSeriesData.gender.length} 項`);
+    }
+    if (timeSeriesData.age) {
+      console.log(`[檢查點] 年齡時間序列數據: ${timeSeriesData.age.length} 項`);
+    }
+  }
+
+  if (productPreferenceData && productPreferenceData.categories) {
+    console.log(`[檢查點] 產品偏好數據: ${productPreferenceData.categories.length} 項`);
+    console.log(`[檢查點] 產品偏好樣本: ${JSON.stringify(productPreferenceData.categories.slice(0, 2))}`);
+  }
+
   console.log("[檢查點] 開始 OpenAI 分析");
   console.log(`[檢查點] 品牌資訊: ${brandName}`);
   console.log(`[檢查點] 性別數據項目數: ${genderDistribution.data.length}`);
   console.log(`[檢查點] 年齡數據項目數: ${ageDistribution.data.length}`);
-  
+
   if (timeSeriesData) {
     console.log(`[檢查點] 時間序列數據可用: ${timeSeriesData.gender ? '性別' : ''}${timeSeriesData.age ? ' 年齡' : ''}`);
   }
-  
+
   if (productPreferenceData) {
     console.log(`[檢查點] 產品偏好數據可用: ${productPreferenceData.categories.length} 個類別`);
   }
-  
+
   // 如果沒有設置 API 金鑰，返回模擬數據
   if (isTest) {
     console.log("[檢查點] 使用模擬數據 (沒有找到 OPENAI_API_KEY)");
     return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
   }
-  
+
   try {
     console.log("[檢查點] 正在準備 OpenAI 請求數據...");
-    
+
     // 準備輸入數據
     const genderData = genderDistribution.data.map(item => `${item.性別 || item.gender}: ${item.比例 || item.percentage}`).join(", ");
     const ageData = ageDistribution.data.map(item => `${item.年齡 || item.age}: ${item.比例 || item.percentage}`).join(", ");
-    
+
     let timeSeriesDesc = "";
     if (timeSeriesData) {
       if (timeSeriesData.gender) {
@@ -58,16 +93,16 @@ async function getAIAnalysis(
         timeSeriesDesc += JSON.stringify(timeSeriesData.age.slice(0, 3)) + "...";
       }
     }
-    
+
     let productPrefDesc = "";
     if (productPreferenceData && productPreferenceData.categories) {
       productPrefDesc = "產品偏好: " + productPreferenceData.categories.map(c => 
         `${c.category}: ${c.A}`
       ).join(", ");
     }
-    
+
     console.log("[檢查點] 發送請求到 OpenAI API...");
-    
+
     // 請求 OpenAI API
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",  // 使用 GPT-4o mini 模型
@@ -100,9 +135,9 @@ async function getAIAnalysis(
       temperature: 0.3,  // 較低的溫度使結果更確定性
       response_format: { type: "json_object" }  // 指定回傳 JSON 格式
     });
-    
+
     console.log("[檢查點] 收到 OpenAI API 響應");
-    
+
     // 解析 API 回應
     try {
       const result = JSON.parse(response.choices[0].message.content);
@@ -127,7 +162,7 @@ async function getAIAnalysis(
 // 模擬 AI 分析結果（當沒有 OpenAI API 密鑰或出錯時使用）
 function getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData) {
   console.log("[檢查點] 使用模擬數據生成分析結果");
-  
+
   const mockResult = {
     industryCategory: "消費品零售",
     targetAudience: `${ageDistribution.primaryAgeGroup}歲的${genderDistribution.primary}為主的消費者，具有較高的購買力和品牌意識`,
