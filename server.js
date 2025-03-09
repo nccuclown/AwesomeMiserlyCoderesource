@@ -115,12 +115,32 @@ app.post('/api/analyze', upload.fields([
 function parseCSVFile(filePath) {
   return new Promise((resolve, reject) => {
     const results = [];
+    
+    console.log(`[檢查點] 開始解析 CSV 文件: ${filePath}`);
 
     fs.createReadStream(filePath)
       .pipe(parse({ columns: true, trim: true }))
-      .on('data', (data) => results.push(data))
-      .on('end', () => resolve(results))
-      .on('error', (error) => reject(error));
+      .on('data', (data) => {
+        results.push(data);
+        // 記錄前幾行數據以便查看格式
+        if (results.length <= 2) {
+          console.log(`[檢查點] CSV 數據樣本: ${JSON.stringify(data)}`);
+        }
+      })
+      .on('end', () => {
+        console.log(`[檢查點] CSV 文件解析完成，共 ${results.length} 行數據`);
+        // 檢查數據是否有必要的欄位
+        if (results.length > 0) {
+          const firstRow = results[0];
+          const columns = Object.keys(firstRow);
+          console.log(`[檢查點] CSV 欄位: ${columns.join(', ')}`);
+        }
+        resolve(results);
+      })
+      .on('error', (error) => {
+        console.error(`[檢查點] CSV 解析錯誤: ${error.message}`);
+        reject(error);
+      });
   });
 }
 
@@ -135,6 +155,13 @@ async function analyzeData(
   timeSeriesGenderData,
   timeSeriesAgeData
 ) {
+  console.log("[檢查點] 開始數據分析，品牌名稱:", brandName);
+  console.log(`[檢查點] 數據概況:
+    - 性別數據: ${genderData.length} 項
+    - 年齡數據: ${ageData.length} 項
+    - 產品偏好: ${productPrefData ? productPrefData.length + ' 項' : '無'}
+    - 時間序列-性別: ${timeSeriesGenderData ? timeSeriesGenderData.length + ' 項' : '無'}
+    - 時間序列-年齡: ${timeSeriesAgeData ? timeSeriesAgeData.length + ' 項' : '無'}`);
   // 處理性別數據
   const genderDistribution = {
     data: genderData,
