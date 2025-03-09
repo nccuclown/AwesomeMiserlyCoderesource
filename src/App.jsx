@@ -71,10 +71,14 @@ export default function App() {
         console.error('伺服器錯誤回應:', errorText);
         
         try {
+          // 嘗試解析 JSON 錯誤訊息
           const errorJson = JSON.parse(errorText);
+          console.error('伺服器錯誤詳情:', errorJson);
           throw new Error(errorJson.error || '分析請求失敗');
-        } catch (e) {
-          throw new Error(`分析請求失敗 (${response.status}): ${errorText.substring(0, 100)}`);
+        } catch (parseError) {
+          // 如果不是 JSON，則顯示原始錯誤文本
+          console.error('無法解析錯誤回應為 JSON:', parseError);
+          throw new Error(`分析請求失敗 (${response.status}): ${errorText.substring(0, 200)}`);
         }
       }
 
