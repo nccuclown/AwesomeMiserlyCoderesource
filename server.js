@@ -37,13 +37,28 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.use((err, req, res, next) => {
   console.error('伺服器錯誤:', err);
   console.error('錯誤堆疊:', err.stack);
+  console.error('錯誤類型:', err.name || 'Unknown Error');
+  console.error('錯誤消息:', err.message || 'No message');
   
-  // 确保返回一致的JSON格式错误
-  return res.status(500).json({ 
-    error: `伺服器錯誤: ${err.message}`,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-    type: err.name || 'Error'
-  });
+  try {
+    // 构建详细的错误响应
+    const errorResponse = { 
+      error: `伺服器錯誤: ${err.message}`,
+      stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+      type: err.name || 'Error',
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('發送錯誤響應:', JSON.stringify(errorResponse));
+    
+    // 确保返回一致的JSON格式错误
+    return res.status(500).json(errorResponse);
+  } catch (responseError) {
+    console.error('構建錯誤響應時失敗:', responseError);
+    
+    // 如果JSON響應构建失败，返回纯文本
+    return res.status(500).send(`伺服器錯誤: ${err.message || '未知錯誤'}`);
+  }
 });
 </old_str>
 
@@ -178,15 +193,21 @@ app.post('/api/analyze', upload.fields([
       }
       
       // 通用错误处理
-      return res.status(500).json({ 
+      const errorDetails = {
         error: '分析過程發生錯誤',
         message: error.message,
-        type: error.name || 'ServerError'
-      });
+        type: error.name || 'ServerError',
+        details: process.env.NODE_ENV === 'production' ? null : error.stack,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('發送錯誤響應:', JSON.stringify(errorDetails));
+      return res.status(500).json(errorDetails);
     } catch (responseError) {
       // 如果构建 JSON 响应时出错，返回纯文本错误
       console.error('錯誤處理過程中出錯:', responseError);
-      return res.status(500).send('服務器內部錯誤，請查看服務器日誌');
+      console.error('原始錯誤:', error);
+      return res.status(500).send(`服務器內部錯誤: ${error.message || '未知錯誤'}`);
     }
   }
 });

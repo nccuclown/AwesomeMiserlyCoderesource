@@ -72,29 +72,40 @@ export default function App() {
         let errorText;
         try {
           errorText = await response.text();
+          console.error('伺服器錯誤回應 (原始文本):', errorText);
         } catch (e) {
+          console.error('讀取錯誤響應失敗:', e);
           errorText = '无法获取错误响应内容';
         }
         
-        console.error('伺服器錯誤回應 (原始文本):', errorText);
+        let errorMessage = `服务器错误 (${response.status})`;
         
-        try {
-          // 嘗試解析 JSON 錯誤訊息
-          const errorJson = JSON.parse(errorText);
-          console.error('伺服器錯誤詳情 (JSON):', errorJson);
-          throw new Error(errorJson.error || errorJson.message || '分析請求失敗');
-        } catch (parseError) {
-          // 如果不是 JSON，則顯示原始錯誤文本
-          console.error('無法解析錯誤回應為 JSON:', parseError);
-          console.error('原始错误内容:', errorText);
-          
-          // 构建更友好的错误消息
-          const errorMessage = `服务器错误 (${response.status}): ${
-            errorText ? errorText.substring(0, 200) : '无详细信息'
-          }`;
-          
-          throw new Error(errorMessage);
+        if (errorText && errorText.trim()) {
+          try {
+            // 嘗試解析 JSON 錯誤訊息
+            const errorJson = JSON.parse(errorText);
+            console.error('伺服器錯誤詳情 (JSON):', errorJson);
+            
+            // 從 JSON 中提取錯誤信息
+            errorMessage = errorJson.error || errorJson.message || '分析請求失敗';
+            
+            if (errorJson.type === 'OpenAIError') {
+              errorMessage = `OpenAI API 錯誤: ${errorJson.details || errorMessage}`;
+            }
+          } catch (parseError) {
+            // 如果不是 JSON，則顯示原始錯誤文本
+            console.error('無法解析錯誤回應為 JSON:', parseError);
+            console.log('原始錯誤內容長度:', errorText ? errorText.length : 0);
+            
+            // 截取合理長度的錯誤信息
+            if (errorText && errorText.length > 0) {
+              errorMessage = `${errorMessage}: ${errorText.substring(0, 200)}${errorText.length > 200 ? '...' : ''}`;
+            }
+          }
         }
+        
+        // 拋出帶有處理後信息的錯誤
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();

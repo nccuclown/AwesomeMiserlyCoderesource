@@ -184,6 +184,9 @@ async function getAIAnalysis(
   } catch (error) {
     console.error('OpenAI API調用失敗:', error);
     console.error('錯誤詳情:', error.response?.data || error.message);
+    console.error('錯誤類型:', error.constructor.name);
+    console.error('錯誤狀態碼:', error.status);
+    console.error('錯誤堆疊:', error.stack);
 
     // 如果API調用失敗，返回模擬數據
     console.log("[檢查點] 發生錯誤，切換到模擬數據");
