@@ -67,14 +67,23 @@ export default function App() {
       });
 
       if (!response.ok) {
-        throw new Error('分析請求失敗');
+        const errorText = await response.text();
+        console.error('伺服器錯誤回應:', errorText);
+        
+        try {
+          const errorJson = JSON.parse(errorText);
+          throw new Error(errorJson.error || '分析請求失敗');
+        } catch (e) {
+          throw new Error(`分析請求失敗 (${response.status}): ${errorText.substring(0, 100)}`);
+        }
       }
 
       const result = await response.json();
+      console.log('分析成功，結果:', result);
       setAnalysisResult(result);
     } catch (error) {
       console.error('分析過程發生錯誤:', error);
-      alert('分析失敗，請重試。');
+      alert(`分析失敗: ${error.message}`);
     } finally {
       setIsLoading(false);
     }

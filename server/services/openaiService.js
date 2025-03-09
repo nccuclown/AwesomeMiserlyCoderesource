@@ -140,22 +140,24 @@ async function getAIAnalysis(
 
     console.log("[檢查點] 收到 OpenAI API 響應");
 
-    // 解析 API 回應
+    // 提取並返回分析結果
+    const content = response.choices[0].message.content;
+    console.log("[檢查點] OpenAI 回應內容:", content.substring(0, 200) + '...');
+
     try {
-      const result = JSON.parse(response.choices[0].message.content);
-      console.log("[檢查點] OpenAI 分析結果成功解析");
+      const result = JSON.parse(content);
+      console.log("[檢查點] 成功獲取並解析 OpenAI 分析結果");
       return result;
     } catch (parseError) {
-      console.error("[檢查點] 解析 OpenAI 響應時出錯:", parseError);
-      console.log("[檢查點] 原始回應:", response.choices[0].message.content);
-      throw new Error("無法解析 AI 回應格式");
+      console.error('[檢查點] JSON解析錯誤:', parseError);
+      console.error('[檢查點] 原始回應內容:', content);
+      throw new Error('OpenAI回應格式錯誤: ' + parseError.message);
     }
   } catch (error) {
-    console.error("[檢查點] OpenAI API 錯誤:", error.message);
-    if (error.response) {
-      console.error("[檢查點] 錯誤詳情:", JSON.stringify(error.response.data));
-    }
-    // 出錯時使用模擬數據
+    console.error('OpenAI API調用失敗:', error);
+    console.error('錯誤詳情:', error.response?.data || error.message);
+
+    // 如果API調用失敗，返回模擬數據
     console.log("[檢查點] 發生錯誤，切換到模擬數據");
     return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
   }
