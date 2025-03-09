@@ -83,7 +83,20 @@ export default function App() {
       setAnalysisResult(result);
     } catch (error) {
       console.error('分析過程發生錯誤:', error);
-      alert(`分析失敗: ${error.message}`);
+      
+      // 設置更具體的錯誤訊息
+      let errorMessage = '分析請求失敗';
+      
+      if (error.message.includes('OpenAI')) {
+        errorMessage = 'OpenAI API錯誤: 請檢查API金鑰設定';
+      } else if (error.message.includes('CSV')) {
+        errorMessage = 'CSV文件格式錯誤: 請確保上傳的文件符合要求格式';
+      } else if (error.message.includes('500')) {
+        errorMessage = '伺服器內部錯誤: 請檢查伺服器日誌';
+      }
+      
+      alert(`分析失敗: ${errorMessage}`);
+      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }

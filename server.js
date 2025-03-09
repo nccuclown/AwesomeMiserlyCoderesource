@@ -31,6 +31,15 @@ app.post('/api/analyze', upload.fields([
     console.log('[分析請求] 表單數據:', req.body);
     console.log('[分析請求] 收到的文件:', req.files ? Object.keys(req.files).map(key => `${key}: ${req.files[key][0]?.originalname}`) : '無文件');
     
+    // 詳細记录文件内容
+    if (req.files) {
+      for (const key in req.files) {
+        if (req.files[key] && req.files[key][0]) {
+          console.log(`[分析請求] ${key} 文件路徑: ${req.files[key][0].path}`);
+        }
+      }
+    }
+    
     // 獲取表單數據
     const brandName = req.body.brandName;
     const brandDescription = req.body.brandDescription;

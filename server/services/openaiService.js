@@ -3,13 +3,36 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// 初始化 OpenAI 客戶端
+// 檢查API金鑰
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) {
+  console.warn('[OpenAI] 警告: 未設置 OPENAI_API_KEY 環境變數，將使用模擬數據');
+}
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: apiKey || "mock_key"
 });
 
-// 用於測試環境的標誌
-const isTest = !process.env.OPENAI_API_KEY;
+// 測試API連接
+async function testOpenAIConnection() {
+  if (!apiKey) {
+    console.log('[OpenAI] 使用模擬金鑰，跳過API連接測試');
+    return false;
+  }
+
+  try {
+    console.log('[OpenAI] 測試API連接...');
+    await openai.models.list();
+    console.log('[OpenAI] API連接成功');
+    return true;
+  } catch (error) {
+    console.error('[OpenAI] API連接測試失敗:', error.message);
+    return false;
+  }
+}
+
+// 啟動時測試連接
+testOpenAIConnection();
 
 async function getAIAnalysis(
   brandName, 
@@ -72,7 +95,7 @@ async function getAIAnalysis(
   }
 
   // 如果沒有設置 API 金鑰，返回模擬數據
-  if (isTest) {
+  if (!apiKey) {
     console.log("[檢查點] 使用模擬數據 (沒有找到 OPENAI_API_KEY)");
     return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
   }
@@ -107,7 +130,7 @@ async function getAIAnalysis(
 
     // 請求 OpenAI API
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",  // 使用 GPT-4o mini 模型
+      model: "gpt-3.5-turbo",  // 使用 GPT-3.5-turbo 模型,更穩定
       messages: [
         {
           role: "system",
