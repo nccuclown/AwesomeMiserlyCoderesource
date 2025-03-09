@@ -1,0 +1,41 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+App.jsx:64 
+            
+            
+           POST https://6ce85be6-1872-4d30-8f44-a07af8223e06-00-gyl0vyjlpxv0.sisko.replit.dev:3002/api/analyze 500 (Internal Server Error)
+performAnalysis @ App.jsx:64
+handleAnalyzeClick @ AnalysisResult.jsx:23
+callCallback2 @ chunk-ZKMK3N6I.js?v=07ceb5d4:3672
+invokeGuardedCallbackDev @ chunk-ZKMK3N6I.js?v=07ceb5d4:3697
+invokeGuardedCallback @ chunk-ZKMK3N6I.js?v=07ceb5d4:3731
+invokeGuardedCallbackAndCatchFirstError @ chunk-ZKMK3N6I.js?v=07ceb5d4:3734
+executeDispatch @ chunk-ZKMK3N6I.js?v=07ceb5d4:7014
+processDispatchQueueItemsInOrder @ chunk-ZKMK3N6I.js?v=07ceb5d4:7034
+processDispatchQueue @ chunk-ZKMK3N6I.js?v=07ceb5d4:7043
+dispatchEventsForPlugins @ chunk-ZKMK3N6I.js?v=07ceb5d4:7051
+(anonymous) @ chunk-ZKMK3N6I.js?v=07ceb5d4:7175
+batchedUpdates$1 @ chunk-ZKMK3N6I.js?v=07ceb5d4:18907
+batchedUpdates @ chunk-ZKMK3N6I.js?v=07ceb5d4:3577
+dispatchEventForPluginEventSystem @ chunk-ZKMK3N6I.js?v=07ceb5d4:7174
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-ZKMK3N6I.js?v=07ceb5d4:5476
+dispatchEvent @ chunk-ZKMK3N6I.js?v=07ceb5d4:5470
+dispatchDiscreteEvent @ chunk-ZKMK3N6I.js?v=07ceb5d4:5447Understand this errorAI
+App.jsx:76 分析過程發生錯誤: 
+performAnalysis @ App.jsx:76
+await in performAnalysis
+handleAnalyzeClick @ AnalysisResult.jsx:23
+callCallback2 @ chunk-ZKMK3N6I.js?v=07ceb5d4:3672
+invokeGuardedCallbackDev @ chunk-ZKMK3N6I.js?v=07ceb5d4:3697
+invokeGuardedCallback @ chunk-ZKMK3N6I.js?v=07ceb5d4:3731
+invokeGuardedCallbackAndCatchFirstError @ chunk-ZKMK3N6I.js?v=07ceb5d4:3734
+executeDispatch @ chunk-ZKMK3N6I.js?v=07ceb5d4:7014
+processDispatchQueueItemsInOrder @ chunk-ZKMK3N6I.js?v=07ceb5d4:7034
+processDispatchQueue @ chunk-ZKMK3N6I.js?v=07ceb5d4:7043
+dispatchEventsForPlugins @ chunk-ZKMK3N6I.js?v=07ceb5d4:7051
+(anonymous) @ chunk-ZKMK3N6I.js?v=07ceb5d4:7175
+batchedUpdates$1 @ chunk-ZKMK3N6I.js?v=07ceb5d4:18907
+batchedUpdates @ chunk-ZKMK3N6I.js?v=07ceb5d4:3577
+dispatchEventForPluginEventSystem @ chunk-ZKMK3N6I.js?v=07ceb5d4:7174
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-ZKMK3N6I.js?v=07ceb5d4:5476
+dispatchEvent @ chunk-ZKMK3N6I.js?v=07ceb5d4:5470
+dispatchDiscreteEvent @ chunk-ZKMK3N6I.js?v=07ceb5d4:5447Understand this errorAI
