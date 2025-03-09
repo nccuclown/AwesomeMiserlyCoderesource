@@ -1,15 +1,41 @@
+
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
 // 初始化 OpenAI 客戶端
-const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
-/**
- * 通過 OpenAI API 獲取數據分析結果
- */
+// 使用 GPT-4o mini 分析品牌資訊
+async function analyzeBrandInfo(brandInfo) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",  // 使用 GPT-4o mini 模型
+      messages: [
+        {
+          role: "system",
+          content: "你是一位專業的品牌分析師，請根據提供的品牌資訊進行分析。分析結果請以JSON格式返回，包含行業類別、目標受眾和品牌特性。"
+        },
+        {
+          role: "user",
+          content: `品牌名稱: ${brandInfo.brandName}\n品牌簡介: ${brandInfo.brandDescription}\n產品資訊: ${brandInfo.productInfo}`
+        }
+      ],
+      temperature: 0.3,  // 較低的溫度使結果更確定性
+      response_format: { type: "json_object" }  // 指定回傳 JSON 格式
+    });
+
+    return JSON.parse(response.choices[0].message.content);
+  } catch (error) {
+    console.error("OpenAI API 呼叫失敗:", error);
+    throw new Error("品牌分析失敗，請稍後再試");
+  }
+}
+
+// 使用 GPT-4o mini 分析受眾數據
 async function getAIAnalysis(
   brandName, 
   brandDescription, 
@@ -19,139 +45,109 @@ async function getAIAnalysis(
   timeSeriesData,
   productPreferenceData
 ) {
-  // 如果沒有配置 API 密鑰，返回模擬數據
-  if (!OPENAI_API_KEY) {
-    console.log("沒有配置 OpenAI API 密鑰，使用模擬數據");
-    return getMockAnalysisResult(
+  try {
+    const prompt = createAnalysisPrompt(
       brandName, 
+      brandDescription, 
+      productInfo, 
       genderDistribution, 
-      ageDistribution, 
-      timeSeriesData, 
+      ageDistribution,
+      timeSeriesData,
       productPreferenceData
     );
-  }
 
-  try {
-    // 構建 OpenAI API 的提示訊息
-    const messages = [
-      {
-        role: "system",
-        content: `你是一位專業的品牌行銷分析師，專精於分析消費者數據並提供品牌定位和市場策略建議。
-        請根據提供的品牌資訊和消費者數據，進行以下分析：
-        1. 確定品牌所屬的行業類別
-        2. 分析目標受眾的特徵和行為模式
-        3. 識別品牌的核心特質和差異化要素
-        4. 分析性別分布數據，揭示受眾性別傾向及其消費行為特點
-        5. 分析年齡分布數據，解釋不同年齡層的消費行為和偏好差異
-        6. 如果有時間序列數據，分析消費趨勢和季節性變化
-        7. 如果有商品類別偏好數據，分析受眾對不同商品的偏好程度
-        8. 提供基於數據的針對性行銷建議，至少5條具體的策略方向
-        9. 識別高價值客群，描述其特徵和行為模式，至少兩個客群
-
-        請用JSON格式返回以下結構的結果：
-        {
-          "industryCategory": "行業類別",
-          "targetAudience": "目標受眾描述",
-          "brandCharacteristics": "品牌特質描述",
-          "genderAnalysis": "性別數據分析結果",
-          "ageAnalysis": "年齡數據分析結果",
-          "timeSeriesAnalysis": "時間序列數據分析結果（如果有）",
-          "productPreferenceAnalysis": "商品類別偏好分析結果（如果有）",
-          "marketingSuggestions": ["建議1", "建議2", "建議3", "建議4", "建議5"],
-          "highValueSegments": [
-            {
-              "name": "客群1名稱",
-              "percentage": "佔比",
-              "description": "特徵描述",
-              "stats": {
-                "averageOrderValue": "平均客單價",
-                "purchaseFrequency": "購買頻率",
-                "repurchaseRate": "回購率"
-              }
-            },
-            {
-              "name": "客群2名稱",
-              "percentage": "佔比",
-              "description": "特徵描述",
-              "stats": {
-                "averageOrderValue": "平均客單價",
-                "purchaseFrequency": "購買頻率",
-                "repurchaseRate": "回購率"
-              }
-            }
-          ]
-        }`
-      },
-      {
-        role: "user",
-        content: `
-          品牌名稱: ${brandName}
-          品牌描述: ${brandDescription || '無'}
-          產品資訊: ${productInfo || '無'}
-
-          性別分布數據: ${JSON.stringify(genderDistribution.data || [])}
-          主要性別: ${genderDistribution.primary || '無'}
-
-          年齡分布數據: ${JSON.stringify(ageDistribution.data || [])}
-          主要年齡段: ${ageDistribution.primaryAgeGroup || '無'}
-
-          ${timeSeriesData ? `時間序列數據: ${JSON.stringify(timeSeriesData)}` : ''}
-          ${productPreferenceData ? `商品類別偏好數據: ${JSON.stringify(productPreferenceData)}` : ''}
-        `
-      }
-    ];
-
-    // 調用 OpenAI API
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",  // 使用 GPT-4o mini 模型
-      messages: messages,
-      temperature: 0.3,  // 較低的溫度使結果更確定性
-      response_format: { type: "json_object" }  // 指定回傳 JSON 格式
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "你是一位專業的品牌受眾分析師，擅長從數據中獲取洞見並提供品牌行銷建議。請基於提供的數據進行深入分析。"
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.3,
+      response_format: { type: "json_object" }
     });
 
-    // 解析回應
-    try {
-      const resultContent = response.choices[0].message.content;
-      const result = JSON.parse(resultContent);
-      return result;
-    } catch (parseError) {
-      console.error('OpenAI 回應解析錯誤:', parseError);
-      // 解析失敗時使用模擬數據
-      return getMockAnalysisResult(
-        brandName, 
-        genderDistribution, 
-        ageDistribution, 
-        timeSeriesData, 
-        productPreferenceData
-      );
-    }
+    return JSON.parse(response.choices[0].message.content);
   } catch (error) {
-    console.error('OpenAI API 調用失敗:', error);
-    // API 調用失敗時使用模擬數據
-    return getMockAnalysisResult(
-      brandName, 
-      genderDistribution, 
-      ageDistribution, 
-      timeSeriesData, 
-      productPreferenceData
-    );
+    console.error("OpenAI API 分析失敗:", error);
+    
+    // 如果API出錯，返回模擬數據
+    return getMockAnalysisResult(brandName, genderDistribution, ageDistribution);
   }
 }
 
-// 生成模擬分析結果
-function getMockAnalysisResult(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData) {
-  const primaryGender = genderDistribution?.primary || '女性';
-  const primaryAgeGroup = ageDistribution?.primaryAgeGroup || '25-34歲';
+// 建立分析提示詞
+function createAnalysisPrompt(
+  brandName, 
+  brandDescription, 
+  productInfo, 
+  genderDistribution, 
+  ageDistribution,
+  timeSeriesData,
+  productPreferenceData
+) {
+  let prompt = `
+請分析以下品牌與受眾數據，並提供品牌受眾特性和行銷建議：
 
-  const mockResult = {
+品牌名稱: ${brandName}
+品牌介紹: ${brandDescription}
+產品資訊: ${productInfo}
+
+性別分布數據:
+${JSON.stringify(genderDistribution.data, null, 2)}
+
+年齡分布數據:
+${JSON.stringify(ageDistribution.data, null, 2)}
+`;
+
+  // 添加時間序列資料（如果有）
+  if (timeSeriesData) {
+    prompt += `\n時間序列數據:\n${JSON.stringify(timeSeriesData, null, 2)}\n`;
+  }
+
+  // 添加產品偏好資料（如果有）
+  if (productPreferenceData) {
+    prompt += `\n商品類別偏好數據:\n${JSON.stringify(productPreferenceData, null, 2)}\n`;
+  }
+
+  prompt += `
+請根據上述數據，進行全面且深入的分析，並以JSON格式回傳以下項目：
+1. industryCategory: 品牌所屬行業類別
+2. targetAudience: 品牌目標受眾描述
+3. brandCharacteristics: 品牌特性分析
+4. genderAnalysis: 性別分布數據的深入分析
+5. ageAnalysis: 年齡分布數據的深入分析
+6. marketingSuggestions: 至少5條針對性的行銷建議
+7. highValueSegments: 至少2個高價值客群分析，每個包含name、percentage、description和stats
+`;
+
+  if (timeSeriesData) {
+    prompt += "8. timeSeriesAnalysis: 時間序列數據的趨勢分析\n";
+  }
+
+  if (productPreferenceData) {
+    prompt += "9. productPreferenceAnalysis: 商品類別偏好數據分析\n";
+  }
+
+  return prompt;
+}
+
+// 模擬分析結果（API失敗時使用）
+function getMockAnalysisResult(brandName, genderDistribution, ageDistribution) {
+  return {
     industryCategory: "消費品零售",
-    targetAudience: `${primaryAgeGroup}的${primaryGender}為主的消費者，具有較高的購買力和品牌意識`,
+    targetAudience: `25-34歲的女性為主的消費者，具有較高的購買力和品牌意識`,
     brandCharacteristics: `${brandName}是一個專注於品質和用戶體驗的品牌，產品設計時尚現代，注重細節和功能性`,
-    genderAnalysis: `您的品牌主要受眾為${primaryGender}，這表明您的產品在該性別群體中較受歡迎。深入分析顯示，這些消費者更注重產品的實用性和設計感。`,
-    ageAnalysis: `您的品牌主要吸引${primaryAgeGroup}的消費者，這一年齡段通常具有較強的消費能力和明確的品牌偏好。他們追求品質生活，願意為優質產品支付溢價。`,
+    genderAnalysis: `您的品牌主要受眾為女性，這表明您的產品在該性別群體中較受歡迎。深入分析顯示，這些消費者更注重產品的實用性和設計感。`,
+    ageAnalysis: `您的品牌主要吸引25-34歲的消費者，這一年齡段通常具有較強的消費能力和明確的品牌偏好。他們追求品質生活，願意為優質產品支付溢價。`,
     marketingSuggestions: [
-      `針對${primaryGender}消費者偏好的社交媒體平台投放精準廣告，如Instagram和TikTok`,
-      `調整產品設計和包裝以更好地滿足${primaryAgeGroup}消費者的審美和功能需求`,
+      `針對女性消費者偏好的社交媒體平台投放精準廣告，如Instagram和TikTok`,
+      `調整產品設計和包裝以更好地滿足25-34歲消費者的審美和功能需求`,
       `開發符合主要受眾生活方式的行銷活動和忠誠度計劃，強調社區感和獨特體驗`,
       `加強品牌故事的傳播，塑造符合目標受眾價值觀的品牌形象`,
       `與目標受眾喜愛的KOL合作，提升品牌在核心消費群體中的影響力`
@@ -160,7 +156,7 @@ function getMockAnalysisResult(brandName, genderDistribution, ageDistribution, t
       {
         name: "品質追求者",
         percentage: "18%",
-        description: `${primaryAgeGroup}的${primaryGender}消費者，月均消費金額超過3000元，購買頻率高，對品牌忠誠度強，非常注重產品品質和設計細節。`,
+        description: "25-34歲的女性消費者，月均消費金額超過3000元，購買頻率高，對品牌忠誠度強，非常注重產品品質和設計細節。",
         stats: {
           averageOrderValue: "¥4,200",
           purchaseFrequency: "3.5次",
@@ -179,20 +175,9 @@ function getMockAnalysisResult(brandName, genderDistribution, ageDistribution, t
       }
     ]
   };
-
-  // 如果有時間序列數據，添加相應的分析
-  if (timeSeriesData) {
-    mockResult.timeSeriesAnalysis = "消費行為時間趨勢分析顯示，您的品牌受眾在節假日期間消費明顯增加，女性消費者在促銷活動期間的響應度高於男性。此外，年初和年末是消費高峰期，建議在這些時間點加強行銷力度。";
-  }
-
-  // 如果有商品類別偏好數據，添加相應的分析
-  if (productPreferenceData) {
-    mockResult.productPreferenceAnalysis = "商品類別偏好分析顯示，您的品牌受眾最看重產品的品質和設計，其次是服務體驗。價格敏感度相對較低，表明您的客戶群體願意為優質產品和體驗支付溢價。建議強化這些優勢領域，並針對便利性方面進行改進。";
-  }
-
-  return mockResult;
 }
 
 export default {
+  analyzeBrandInfo,
   getAIAnalysis
 };
