@@ -20,6 +20,8 @@ async function getAIAnalysis(
   timeSeriesData,
   productPreferenceData
 ) {
+  console.log('[OpenAI分析] 開始AI分析，品牌:', brandName);
+  console.log('[OpenAI分析] 檢查環境變數:', process.env.OPENAI_API_KEY ? '有API金鑰' : '缺少API金鑰');
   console.log("[檢查點] OpenAI API 請求數據準備開始");
   console.log(`[檢查點] 品牌名稱: ${brandName}`);
   console.log(`[檢查點] 品牌描述: ${brandDescription}`);

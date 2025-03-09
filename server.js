@@ -27,10 +27,19 @@ app.post('/api/analyze', upload.fields([
   { name: 'timeSeriesAgeFile', maxCount: 1 }
 ]), async (req, res) => {
   try {
+    console.log('[分析請求] 開始處理分析請求');
+    console.log('[分析請求] 表單數據:', req.body);
+    console.log('[分析請求] 收到的文件:', req.files ? Object.keys(req.files).map(key => `${key}: ${req.files[key][0]?.originalname}`) : '無文件');
+    
     // 獲取表單數據
     const brandName = req.body.brandName;
     const brandDescription = req.body.brandDescription;
     const productInfo = req.body.productInfo;
+    
+    if (!brandName) {
+      console.log('[分析請求] 缺少品牌名稱');
+      return res.status(400).json({ error: '缺少品牌名稱' });
+    }
 
     // 初始化數據變量
     let genderData = null;
@@ -107,7 +116,19 @@ app.post('/api/analyze', upload.fields([
     res.json(analysisResult);
   } catch (error) {
     console.error('分析過程發生錯誤:', error);
-    res.status(500).json({ error: '分析過程發生錯誤' });
+    console.error('錯誤堆疊:', error.stack);
+    
+    // 檢查是否為OpenAI服務錯誤
+    if (error.message && error.message.includes('OpenAI')) {
+      return res.status(500).json({ error: 'OpenAI 服務錯誤，請檢查 API 金鑰設定' });
+    }
+    
+    // 檢查是否為文件解析錯誤
+    if (error.message && error.message.includes('CSV')) {
+      return res.status(400).json({ error: 'CSV 文件格式錯誤，請確保符合需求格式' });
+    }
+    
+    res.status(500).json({ error: '分析過程發生錯誤: ' + error.message });
   }
 });
 
