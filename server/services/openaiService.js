@@ -6,7 +6,10 @@ dotenv.config();
 // 檢查API金鑰
 const apiKey = process.env.OPENAI_API_KEY;
 if (!apiKey) {
-  console.warn('[OpenAI] 警告: 未設置 OPENAI_API_KEY 環境變數，將使用模擬數據');
+  console.warn('[OpenAI] 警告: 未設置 OPENAI_API_KEY');
+} else {
+  console.log('[OpenAI] API KEY 已設置，金鑰前5個字符:', apiKey.substring(0, 5) + '...');
+  console.log('[OpenAI] API KEY 長度:', apiKey.length);
 }
 
 const openai = new OpenAI({
@@ -99,7 +102,7 @@ async function getAIAnalysis(
     console.log("[檢查點] 使用模擬數據 (沒有找到 OPENAI_API_KEY)");
     return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
   }
-  
+
   console.log("[檢查點] 使用 OpenAI API，金鑰前5位字元:", apiKey ? apiKey.substring(0, 5) + "..." : "未設置");
 
   try {
