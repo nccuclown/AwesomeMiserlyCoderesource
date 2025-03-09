@@ -107,7 +107,7 @@ ${timeSeriesData.age ? "年齡時間序列: " + JSON.stringify(timeSeriesData.ag
 
     // 調用 OpenAI API
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini", // 更新为 gpt-4o-mini 模型
       messages: [
         {
           role: "system",
