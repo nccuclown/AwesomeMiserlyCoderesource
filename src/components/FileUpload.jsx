@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 const FileUpload = ({ onUpload }) => {
@@ -6,7 +5,7 @@ const FileUpload = ({ onUpload }) => {
     gender: null,
     age: null
   });
-  
+
   const [errors, setErrors] = useState({});
 
   const validateFile = (file, type) => {
@@ -14,28 +13,28 @@ const FileUpload = ({ onUpload }) => {
     if (!file) {
       return `請上傳${type === 'gender' ? '性別' : '年齡'}分布數據文件`;
     }
-    
+
     // 檢查文件類型
     if (file.type !== 'text/csv') {
       return '請上傳CSV格式的文件';
     }
-    
+
     // 檢查文件大小 (限制為2MB)
     if (file.size > 2 * 1024 * 1024) {
       return '文件大小不能超過2MB';
     }
-    
+
     return null;
   };
 
   const handleFileChange = (e, type) => {
     const file = e.target.files[0];
-    
+
     setFiles(prevFiles => ({
       ...prevFiles,
       [type]: file
     }));
-    
+
     // 清除對應的錯誤信息
     if (errors[type]) {
       setErrors(prevErrors => ({
@@ -47,18 +46,18 @@ const FileUpload = ({ onUpload }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // 驗證兩個文件
     const genderError = validateFile(files.gender, 'gender');
     const ageError = validateFile(files.age, 'age');
-    
+
     const newErrors = {
       gender: genderError,
       age: ageError
     };
-    
+
     setErrors(newErrors);
-    
+
     // 如果沒有錯誤，則提交文件
     if (!genderError && !ageError) {
       onUpload(files);
@@ -69,7 +68,7 @@ const FileUpload = ({ onUpload }) => {
     <div className="form-container">
       <h2>上傳受眾數據</h2>
       <p>請上傳包含受眾性別和年齡分布的CSV文件。</p>
-      
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="genderFile">性別分布數據 (CSV)</label>
@@ -88,7 +87,7 @@ const FileUpload = ({ onUpload }) => {
           )}
           {errors.gender && <div className="error-message">{errors.gender}</div>}
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="ageFile">年齡分布數據 (CSV)</label>
           <p className="file-format-info">CSV格式應包含「年齡」和「比例」欄位</p>
@@ -106,7 +105,7 @@ const FileUpload = ({ onUpload }) => {
           )}
           {errors.age && <div className="error-message">{errors.age}</div>}
         </div>
-        
+
         <button type="submit">下一步</button>
       </form>
     </div>
@@ -148,20 +147,20 @@ function FileUpload({ onUpload }) {
 
   const validateFile = (file, type) => {
     const newErrors = { ...errors };
-    
+
     // 檢查文件類型
     if (!file.name.endsWith('.csv')) {
       newErrors[type] = '請上傳CSV文件';
     } else {
       delete newErrors[type];
     }
-    
+
     setErrors(newErrors);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // 檢查是否有至少一個有效的文件
     if (!genderFile && !ageFile) {
       setErrors({
@@ -170,7 +169,7 @@ function FileUpload({ onUpload }) {
       });
       return;
     }
-    
+
     // 如果沒有錯誤，繼續上傳
     if (Object.keys(errors).length === 0 || (Object.keys(errors).length === 1 && errors.general)) {
       onUpload({
@@ -185,12 +184,12 @@ function FileUpload({ onUpload }) {
     <div className="file-upload">
       <h2>上傳數據文件</h2>
       <p className="upload-instructions">請上傳您的品牌受眾數據CSV文件。必須包含指定的格式和欄位。</p>
-      
+
       <form onSubmit={handleSubmit}>
         <div className="file-types">
           <div className="file-type-card">
             <h3>基本數據文件 (必選)</h3>
-            
+
             <div className="file-input-group">
               <label>性別分布數據</label>
               <div className="file-upload-container">
@@ -207,7 +206,7 @@ function FileUpload({ onUpload }) {
               {errors.gender && <p className="error-message">{errors.gender}</p>}
               <small>格式: CSV文件，包含「性別」和「比例」欄位</small>
             </div>
-            
+
             <div className="file-input-group">
               <label>年齡分布數據</label>
               <div className="file-upload-container">
@@ -225,10 +224,10 @@ function FileUpload({ onUpload }) {
               <small>格式: CSV文件，包含「年齡」和「比例」欄位</small>
             </div>
           </div>
-          
+
           <div className="file-type-card">
             <h3>進階數據文件 (選填)</h3>
-            
+
             <div className="file-input-group">
               <label>商品類別偏好數據</label>
               <div className="file-upload-container">
@@ -247,16 +246,16 @@ function FileUpload({ onUpload }) {
             </div>
           </div>
         </div>
-        
+
         {errors.general && <p className="error-message general-error">{errors.general}</p>}
-        
+
         <div className="upload-actions">
           <button type="submit" className="upload-button">
             繼續
           </button>
         </div>
       </form>
-      
+
       <div className="file-format-help">
         <h3>CSV檔案格式說明</h3>
         <div className="format-examples">
