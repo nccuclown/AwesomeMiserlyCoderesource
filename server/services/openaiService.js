@@ -1,83 +1,91 @@
 
-import { OpenAI } from 'openai';
-import dotenv from 'dotenv';
-dotenv.config();
+import OpenAI from 'openai';
+
+// 獲取 OpenAI API 密鑰
+const apiKey = process.env.OPENAI_API_KEY || '';
 
 // 初始化 OpenAI 客戶端
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const openai = apiKey ? new OpenAI({ apiKey }) : null;
 
-// 使用 GPT-4o 分析品牌資訊
-async function analyzeBrandInfo(brandInfo) {
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",  // 使用 GPT-4o 模型
-      messages: [
-        {
-          role: "system",
-          content: "你是一位專業的品牌分析師，請根據提供的品牌資訊進行分析。分析結果請以JSON格式返回，包含行業類別、目標受眾和品牌特性。"
-        },
-        {
-          role: "user",
-          content: `品牌名稱: ${brandInfo.brandName}\n品牌簡介: ${brandInfo.brandDescription}\n產品資訊: ${brandInfo.productInfo}`
-        }
-      ],
-      temperature: 0.3,  // 較低的溫度使結果更確定性
-      response_format: { type: "json_object" }  // 指定回傳 JSON 格式
-    });
+// 外部輸出的主要方法
+export default {
+  getAIAnalysis
+};
 
-    return JSON.parse(response.choices[0].message.content);
-  } catch (error) {
-    console.error("OpenAI API 錯誤:", error);
-    throw new Error(`分析品牌資訊時發生錯誤: ${error.message}`);
+/**
+ * 通過 OpenAI API 獲取數據分析結果
+ */
+async function getAIAnalysis(
+  brandName, 
+  brandDescription, 
+  productInfo, 
+  genderDistribution, 
+  ageDistribution,
+  timeSeriesData,
+  productPreferenceData
+) {
+  // 如果沒有配置 API 密鑰，返回模擬數據
+  if (!apiKey) {
+    console.log("沒有配置 OpenAI API 密鑰，使用模擬數據");
+    return getMockAnalysis(
+      brandName, 
+      genderDistribution, 
+      ageDistribution, 
+      timeSeriesData, 
+      productPreferenceData
+    );
   }
-}
 
-// 生成受眾分析報告
-async function generateAudienceReport(brandAnalysis, audienceData) {
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "你是一位專業的受眾分析專家，請根據提供的品牌分析和受眾數據生成深入的分析報告。"
-        },
-        {
-          role: "user",
-          content: `品牌分析: ${JSON.stringify(brandAnalysis)}\n受眾數據: ${JSON.stringify(audienceData)}`
-        }
-      ],
-      temperature: 0.5,
-      max_tokens: 1000  // 控制回應長度
-    });
-
-    return response.choices[0].message.content;
-  } catch (error) {
-    console.error("OpenAI API 錯誤:", error);
-    throw new Error(`生成報告時發生錯誤: ${error.message}`);
-  }
-}
-
-// 分析數據並提供詳細的市場分析報告
-async function getAIAnalysis(brandName, brandDescription, productInfo, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData) {
-  try {
-    // 構建提示，包含所有可用的數據
+    // 構建 OpenAI API 的提示訊息
     const messages = [
       {
         role: "system",
-        content: `
-          請你擔任資深市場分析師和品牌顧問，分析以下品牌資訊並提供詳細的受眾分析和行銷建議。
-          請以JSON格式提供以下詳細分析：
-          1. "industryCategory": [行業類別]
-          2. "targetAudience": [目標受眾的詳細特徵描述]
-          3. "brandCharacteristics": [品牌特點摘要]
-          4. "genderAnalysis": [詳細的性別分布分析，包含洞察和趨勢]
-          5. "ageAnalysis": [詳細的年齡分布分析，包含洞察和趨勢]
-          6. "marketingSuggestions": [至少五點針對性的行銷建議數組]
-          7. "highValueSegments": [高價值客群識別和特徵描述，至少兩個客群]
-        `
+        content: `你是一位專業的品牌行銷分析師，專精於分析消費者數據並提供品牌定位和市場策略建議。
+        請根據提供的品牌資訊和消費者數據，進行以下分析：
+        1. 確定品牌所屬的行業類別
+        2. 分析目標受眾的特徵和行為模式
+        3. 識別品牌的核心特質和差異化要素
+        4. 分析性別分布數據，揭示受眾性別傾向及其消費行為特點
+        5. 分析年齡分布數據，解釋不同年齡層的消費行為和偏好差異
+        6. 如果有時間序列數據，分析消費趨勢和季節性變化
+        7. 如果有商品類別偏好數據，分析受眾對不同商品的偏好程度
+        8. 提供基於數據的針對性行銷建議，至少5條具體的策略方向
+        9. 識別高價值客群，描述其特徵和行為模式，至少兩個客群
+        
+        請用JSON格式返回以下結構的結果：
+        {
+          "industryCategory": "行業類別",
+          "targetAudience": "目標受眾描述",
+          "brandCharacteristics": "品牌特質描述",
+          "genderAnalysis": "性別數據分析結果",
+          "ageAnalysis": "年齡數據分析結果",
+          "timeSeriesAnalysis": "時間序列數據分析結果（如果有）",
+          "productPreferenceAnalysis": "商品類別偏好分析（如果有）",
+          "marketingSuggestions": ["建議1", "建議2", "建議3", "建議4", "建議5"],
+          "highValueSegments": [
+            {
+              "name": "客群1名稱",
+              "percentage": "佔比",
+              "description": "特徵描述",
+              "stats": {
+                "averageOrderValue": "平均客單價",
+                "purchaseFrequency": "購買頻率",
+                "repurchaseRate": "回購率"
+              }
+            },
+            {
+              "name": "客群2名稱",
+              "percentage": "佔比",
+              "description": "特徵描述",
+              "stats": {
+                "averageOrderValue": "平均客單價",
+                "purchaseFrequency": "購買頻率",
+                "repurchaseRate": "回購率"
+              }
+            }
+          ]
+        }`
       },
       {
         role: "user",
@@ -168,15 +176,3 @@ function getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSer
 
   return mockResult;
 }
-
-export {
-  analyzeBrandInfo,
-  generateAudienceReport,
-  getAIAnalysis
-};
-
-export default {
-  analyzeBrandInfo,
-  generateAudienceReport,
-  getAIAnalysis
-};
