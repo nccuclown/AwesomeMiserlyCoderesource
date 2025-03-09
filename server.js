@@ -4,7 +4,7 @@ import { parse } from 'csv-parse';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import openaiService from './services/openaiService.js'; // Import the new service
+import openaiService from './server/services/openaiService.js'; // Import the new service
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

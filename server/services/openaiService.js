@@ -1,17 +1,18 @@
 
-const { OpenAI } = require('openai');
-require('dotenv').config();
+import { OpenAI } from 'openai';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // 初始化 OpenAI 客戶端
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// 使用 GPT-4o mini 分析品牌資訊
+// 使用 GPT-4o 分析品牌資訊
 async function analyzeBrandInfo(brandInfo) {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",  // 使用 GPT-4o mini 模型
+      model: "gpt-4o",  // 使用 GPT-4o 模型
       messages: [
         {
           role: "system",
@@ -37,7 +38,7 @@ async function analyzeBrandInfo(brandInfo) {
 async function generateAudienceReport(brandAnalysis, audienceData) {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -81,50 +82,42 @@ async function getAIAnalysis(brandName, brandDescription, productInfo, genderDis
       {
         role: "user",
         content: `
-          品牌名稱：${brandName}
-          品牌簡介：${brandDescription}
-          產品資訊：${productInfo}
-          
-          性別分布數據：
-          ${JSON.stringify(genderDistribution.data)}
-          
-          年齡分布數據：
-          ${JSON.stringify(ageDistribution.data)}
-          
-          ${timeSeriesData ? `時間序列消費行為數據：${JSON.stringify(timeSeriesData.gender)}` : ''}
-          
-          ${productPreferenceData ? `商品類別偏好數據：${JSON.stringify(productPreferenceData.categories)}` : ''}
+          品牌名稱: ${brandName}
+          品牌描述: ${brandDescription}
+          產品資訊: ${productInfo}
+          性別分布: ${JSON.stringify(genderDistribution)}
+          年齡分布: ${JSON.stringify(ageDistribution)}
+          ${timeSeriesData ? `時間序列數據: ${JSON.stringify(timeSeriesData)}` : ''}
+          ${productPreferenceData ? `產品偏好數據: ${JSON.stringify(productPreferenceData)}` : ''}
         `
       }
     ];
-    
-    // 如果有時間序列和商品偏好分析請求，添加到system prompt
-    let systemPrompt = messages[0].content;
-    if (timeSeriesData) {
-      systemPrompt += '\n8. "timeSeriesAnalysis": [消費行為時間趨勢分析]';
-    }
-    
-    if (productPreferenceData) {
-      systemPrompt += '\n9. "productPreferenceAnalysis": [商品類別偏好深度分析]';
-    }
-    
-    messages[0].content = systemPrompt;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: messages,
-      temperature: 0.7,
+      temperature: 0.4,
       response_format: { type: "json_object" }
     });
 
-    return JSON.parse(response.choices[0].message.content);
+    // 解析 AI 回應
+    const result = JSON.parse(response.choices[0].message.content);
+    
+    return result;
   } catch (error) {
-    console.error("OpenAI API 錯誤:", error);
-    return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
+    console.error("OpenAI API 分析錯誤:", error);
+    // 如果 OpenAI API 出錯，返回模擬數據，應用程序可以繼續運行
+    return getMockAnalysis(
+      brandName, 
+      genderDistribution, 
+      ageDistribution, 
+      timeSeriesData, 
+      productPreferenceData
+    );
   }
 }
 
-// 模擬 AI 分析結果（當沒有 OpenAI API 密鑰時使用）
+// 模擬 AI 分析結果（當 OpenAI API 出錯時使用）
 function getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData) {
   const mockResult = {
     industryCategory: "消費品零售",
@@ -162,21 +155,27 @@ function getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSer
       }
     ]
   };
-  
+
   // 如果有時間序列數據，添加相應的分析
   if (timeSeriesData) {
     mockResult.timeSeriesAnalysis = "消費行為時間趨勢分析顯示，您的品牌受眾在節假日期間消費明顯增加，女性消費者在促銷活動期間的響應度高於男性。此外，年初和年末是消費高峰期，建議在這些時間點加強行銷力度。";
   }
-  
+
   // 如果有商品類別偏好數據，添加相應的分析
   if (productPreferenceData) {
     mockResult.productPreferenceAnalysis = "商品類別偏好分析顯示，您的品牌受眾最看重產品的品質和設計，其次是服務體驗。價格敏感度相對較低，表明您的客戶群體願意為優質產品和體驗支付溢價。建議強化這些優勢領域，並針對便利性方面進行改進。";
   }
-  
+
   return mockResult;
 }
 
-module.exports = {
+export {
+  analyzeBrandInfo,
+  generateAudienceReport,
+  getAIAnalysis
+};
+
+export default {
   analyzeBrandInfo,
   generateAudienceReport,
   getAIAnalysis
