@@ -5,6 +5,10 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import openaiService from './server/services/openaiService.js'; // Import the new service
+import dotenv from 'dotenv';
+
+// 載入環境變數
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,8 +19,26 @@ const port = process.env.PORT || 3000;
 // 配置 multer 以處理文件上傳
 const upload = multer({ dest: 'uploads/' });
 
+// 啟用 CORS 以處理跨源請求
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 // 服務靜態文件
 app.use(express.static(path.join(__dirname, 'dist')));
+
+// 添加全域錯誤處理中間件
+app.use((err, req, res, next) => {
+  console.error('伺服器錯誤:', err);
+  console.error('錯誤堆疊:', err.stack);
+  res.status(500).json({ error: `伺服器錯誤: ${err.message}` });
+});
 
 // API 路由處理
 app.post('/api/analyze', upload.fields([
@@ -518,6 +540,16 @@ function extractMarketingSuggestions(lines) {
 // 啟動服務器
 app.listen(port, '0.0.0.0', () => {
   console.log(`服務器運行在 http://0.0.0.0:${port}`);
+  console.log(`API端點: http://0.0.0.0:${port}/api/analyze`);
+  console.log(`當前環境變數: NODE_ENV=${process.env.NODE_ENV}`);
+  
+  // 檢查OpenAI API金鑰
+  const hasApiKey = !!process.env.OPENAI_API_KEY;
+  console.log(`OpenAI API金鑰狀態: ${hasApiKey ? '已設置' : '未設置'}`);
+  
+  if (!hasApiKey) {
+    console.log('注意: 未設置OpenAI API金鑰，將使用模擬數據');
+  }
 });
 
 // 處理所有其他請求，返回 index.html

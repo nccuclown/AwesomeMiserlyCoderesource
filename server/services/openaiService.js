@@ -99,6 +99,8 @@ async function getAIAnalysis(
     console.log("[檢查點] 使用模擬數據 (沒有找到 OPENAI_API_KEY)");
     return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
   }
+  
+  console.log("[檢查點] 使用 OpenAI API，金鑰前5位字元:", apiKey ? apiKey.substring(0, 5) + "..." : "未設置");
 
   try {
     console.log("[檢查點] 正在準備 OpenAI 請求數據...");
