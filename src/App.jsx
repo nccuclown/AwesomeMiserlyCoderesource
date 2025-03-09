@@ -67,18 +67,33 @@ export default function App() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('伺服器錯誤回應:', errorText);
+        console.error('服务器返回状态码:', response.status);
+        
+        let errorText;
+        try {
+          errorText = await response.text();
+        } catch (e) {
+          errorText = '无法获取错误响应内容';
+        }
+        
+        console.error('伺服器錯誤回應 (原始文本):', errorText);
         
         try {
           // 嘗試解析 JSON 錯誤訊息
           const errorJson = JSON.parse(errorText);
-          console.error('伺服器錯誤詳情:', errorJson);
-          throw new Error(errorJson.error || '分析請求失敗');
+          console.error('伺服器錯誤詳情 (JSON):', errorJson);
+          throw new Error(errorJson.error || errorJson.message || '分析請求失敗');
         } catch (parseError) {
           // 如果不是 JSON，則顯示原始錯誤文本
           console.error('無法解析錯誤回應為 JSON:', parseError);
-          throw new Error(`分析請求失敗 (${response.status}): ${errorText.substring(0, 200)}`);
+          console.error('原始错误内容:', errorText);
+          
+          // 构建更友好的错误消息
+          const errorMessage = `服务器错误 (${response.status}): ${
+            errorText ? errorText.substring(0, 200) : '无详细信息'
+          }`;
+          
+          throw new Error(errorMessage);
         }
       }
 

@@ -37,8 +37,15 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.use((err, req, res, next) => {
   console.error('伺服器錯誤:', err);
   console.error('錯誤堆疊:', err.stack);
-  res.status(500).json({ error: `伺服器錯誤: ${err.message}` });
+  
+  // 确保返回一致的JSON格式错误
+  return res.status(500).json({ 
+    error: `伺服器錯誤: ${err.message}`,
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+    type: err.name || 'Error'
+  });
 });
+</old_str>
 
 // API 路由處理
 app.post('/api/analyze', upload.fields([
@@ -48,6 +55,7 @@ app.post('/api/analyze', upload.fields([
   { name: 'timeSeriesGenderFile', maxCount: 1 },
   { name: 'timeSeriesAgeFile', maxCount: 1 }
 ]), async (req, res) => {
+  console.log('[API] 收到分析请求');
   try {
     console.log('[分析請求] 開始處理分析請求');
     console.log('[分析請求] 表單數據:', req.body);
@@ -148,18 +156,38 @@ app.post('/api/analyze', upload.fields([
   } catch (error) {
     console.error('分析過程發生錯誤:', error);
     console.error('錯誤堆疊:', error.stack);
+    console.error('錯誤類型:', error.name || 'Unknown');
     
-    // 檢查是否為OpenAI服務錯誤
-    if (error.message && error.message.includes('OpenAI')) {
-      return res.status(500).json({ error: 'OpenAI 服務錯誤，請檢查 API 金鑰設定' });
+    try {
+      // 檢查是否為OpenAI服務錯誤
+      if (error.message && error.message.includes('OpenAI')) {
+        return res.status(500).json({ 
+          error: 'OpenAI 服務錯誤，請檢查 API 金鑰設定',
+          details: error.message,
+          type: 'OpenAIError'
+        });
+      }
+      
+      // 檢查是否為文件解析錯誤
+      if (error.message && error.message.includes('CSV')) {
+        return res.status(400).json({ 
+          error: 'CSV 文件格式錯誤，請確保符合需求格式',
+          details: error.message,
+          type: 'CSVParseError'
+        });
+      }
+      
+      // 通用错误处理
+      return res.status(500).json({ 
+        error: '分析過程發生錯誤',
+        message: error.message,
+        type: error.name || 'ServerError'
+      });
+    } catch (responseError) {
+      // 如果构建 JSON 响应时出错，返回纯文本错误
+      console.error('錯誤處理過程中出錯:', responseError);
+      return res.status(500).send('服務器內部錯誤，請查看服務器日誌');
     }
-    
-    // 檢查是否為文件解析錯誤
-    if (error.message && error.message.includes('CSV')) {
-      return res.status(400).json({ error: 'CSV 文件格式錯誤，請確保符合需求格式' });
-    }
-    
-    res.status(500).json({ error: '分析過程發生錯誤: ' + error.message });
   }
 });
 
@@ -537,10 +565,24 @@ function extractMarketingSuggestions(lines) {
   return suggestions.length > 0 ? suggestions : ["針對您的目標受眾進行社交媒體行銷", "開發更符合主要客群需求的產品", "優化品牌訊息以吸引核心受眾"];
 }
 
+// 添加调试端点
+app.get('/api/debug/status', (req, res) => {
+  const hasApiKey = !!process.env.OPENAI_API_KEY;
+  res.json({
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    openai_api_key_exists: hasApiKey,
+    openai_api_key_prefix: hasApiKey ? process.env.OPENAI_API_KEY.substring(0, 5) + '...' : null,
+    openai_api_key_length: hasApiKey ? process.env.OPENAI_API_KEY.length : 0
+  });
+});
+
 // 啟動服務器
 app.listen(port, '0.0.0.0', () => {
   console.log(`服務器運行在 http://0.0.0.0:${port}`);
   console.log(`API端點: http://0.0.0.0:${port}/api/analyze`);
+  console.log(`API调试端点: http://0.0.0.0:${port}/api/debug/status`);
   console.log(`當前環境變數: NODE_ENV=${process.env.NODE_ENV}`);
   
   // 檢查OpenAI API金鑰
