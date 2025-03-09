@@ -16,6 +16,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Express JSON 解析中間件 - 確保在路由之前
+app.use(express.json());
+
 // 配置 multer 以處理文件上傳
 const upload = multer({ dest: 'uploads/' });
 
@@ -33,39 +36,33 @@ app.use((req, res, next) => {
 // 服務靜態文件
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// 添加全域錯誤處理中間件
+// 添加全域錯誤處理中間件 - 修復格式
 app.use((err, req, res, next) => {
   console.error('伺服器錯誤:', err);
   console.error('錯誤堆疊:', err.stack);
   console.error('錯誤類型:', err.name || 'Unknown Error');
   console.error('錯誤消息:', err.message || 'No message');
-  
+
   try {
-    // 构建详细的错误响应
+    // 構建詳細的錯誤響應
     const errorResponse = { 
       error: `伺服器錯誤: ${err.message}`,
       stack: process.env.NODE_ENV === 'production' ? null : err.stack,
       type: err.name || 'Error',
-
-// Express JSON 解析中間件
-app.use(express.json());
-
-
       timestamp: new Date().toISOString()
     };
-    
+
     console.log('發送錯誤響應:', JSON.stringify(errorResponse));
-    
-    // 确保返回一致的JSON格式错误
+
+    // 確保返回一致的JSON格式錯誤
     return res.status(500).json(errorResponse);
   } catch (responseError) {
     console.error('構建錯誤響應時失敗:', responseError);
-    
+
     // 如果JSON響應构建失败，返回纯文本
     return res.status(500).send(`伺服器錯誤: ${err.message || '未知錯誤'}`);
   }
 });
-</old_str>
 
 // API 路由處理
 app.post('/api/analyze', upload.fields([
@@ -80,7 +77,7 @@ app.post('/api/analyze', upload.fields([
     console.log('[分析請求] 開始處理分析請求');
     console.log('[分析請求] 表單數據:', req.body);
     console.log('[分析請求] 收到的文件:', req.files ? Object.keys(req.files).map(key => `${key}: ${req.files[key][0]?.originalname}`) : '無文件');
-    
+
     // 詳細记录文件内容
     if (req.files) {
       for (const key in req.files) {
@@ -89,12 +86,12 @@ app.post('/api/analyze', upload.fields([
         }
       }
     }
-    
+
     // 獲取表單數據
     const brandName = req.body.brandName;
     const brandDescription = req.body.brandDescription;
     const productInfo = req.body.productInfo;
-    
+
     if (!brandName) {
       console.log('[分析請求] 缺少品牌名稱');
       return res.status(400).json({ error: '缺少品牌名稱' });
@@ -177,7 +174,7 @@ app.post('/api/analyze', upload.fields([
     console.error('分析過程發生錯誤:', error);
     console.error('錯誤堆疊:', error.stack);
     console.error('錯誤類型:', error.name || 'Unknown');
-    
+
     try {
       // 檢查是否為OpenAI服務錯誤
       if (error.message && error.message.includes('OpenAI')) {
@@ -187,7 +184,7 @@ app.post('/api/analyze', upload.fields([
           type: 'OpenAIError'
         });
       }
-      
+
       // 檢查是否為文件解析錯誤
       if (error.message && error.message.includes('CSV')) {
         return res.status(400).json({ 
@@ -196,7 +193,7 @@ app.post('/api/analyze', upload.fields([
           type: 'CSVParseError'
         });
       }
-      
+
       // 通用错误处理
       const errorDetails = {
         error: '分析過程發生錯誤',
@@ -205,7 +202,7 @@ app.post('/api/analyze', upload.fields([
         details: process.env.NODE_ENV === 'production' ? null : error.stack,
         timestamp: new Date().toISOString()
       };
-      
+
       console.log('發送錯誤響應:', JSON.stringify(errorDetails));
       return res.status(500).json(errorDetails);
     } catch (responseError) {
@@ -221,7 +218,7 @@ app.post('/api/analyze', upload.fields([
 function parseCSVFile(filePath) {
   return new Promise((resolve, reject) => {
     const results = [];
-    
+
     console.log(`[檢查點] 開始解析 CSV 文件: ${filePath}`);
 
     fs.createReadStream(filePath)
@@ -457,140 +454,6 @@ function getPrimaryCategory(data, categoryField, valueField) {
 }
 
 
-// 模擬 AI 分析結果（當沒有 OpenAI API 密鑰時使用）
-function getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData) {
-  const mockResult = {
-    industryCategory: "消費品零售",
-    targetAudience: `${ageDistribution.primaryAgeGroup}歲的${genderDistribution.primary}為主的消費者，具有較高的購買力和品牌意識`,
-    brandCharacteristics: `${brandName}是一個專注於品質和用戶體驗的品牌，產品設計時尚現代，注重細節和功能性`,
-    genderAnalysis: `您的品牌主要受眾為${genderDistribution.primary}，這表明您的產品在該性別群體中較受歡迎。深入分析顯示，這些消費者更注重產品的實用性和設計感。`,
-    ageAnalysis: `您的品牌主要吸引${ageDistribution.primaryAgeGroup}歲的消費者，這一年齡段通常具有較強的消費能力和明確的品牌偏好。他們追求品質生活，願意為優質產品支付溢價。`,
-    marketingSuggestions: [
-      `針對${genderDistribution.primary}消費者偏好的社交媒體平台投放精準廣告，如Instagram和TikTok`,
-      `調整產品設計和包裝以更好地滿足${ageDistribution.primaryAgeGroup}歲消費者的審美和功能需求`,
-      `開發符合主要受眾生活方式的行銷活動和忠誠度計劃，強調社區感和獨特體驗`,
-      `加強品牌故事的傳播，塑造符合目標受眾價值觀的品牌形象`,
-      `與目標受眾喜愛的KOL合作，提升品牌在核心消費群體中的影響力`
-    ],
-    highValueSegments: [
-      {
-        name: "品質追求者",
-        percentage: "18%",
-        description: `${ageDistribution.primaryAgeGroup}歲的${genderDistribution.primary}消費者，月均消費金額超過3000元，購買頻率高，對品牌忠誠度強，非常注重產品品質和設計細節。`,
-        stats: {
-          averageOrderValue: "¥4,200",
-          purchaseFrequency: "3.5次",
-          repurchaseRate: "85%"
-        }
-      },
-      {
-        name: "時尚先鋒",
-        percentage: "12%",
-        description: "18-24歲的年輕消費者，對新品嘗試意願高，社交媒體影響力大，平均客單價中等但增長迅速，非常看重品牌形象和社交價值。",
-        stats: {
-          averageOrderValue: "¥2,100",
-          purchaseFrequency: "2.8次",
-          repurchaseRate: "65%"
-        }
-      }
-    ]
-  };
-
-  // 如果有時間序列數據，添加相應的分析
-  if (timeSeriesData) {
-    mockResult.timeSeriesAnalysis = "消費行為時間趨勢分析顯示，您的品牌受眾在節假日期間消費明顯增加，女性消費者在促銷活動期間的響應度高於男性。此外，年初和年末是消費高峰期，建議在這些時間點加強行銷力度。";
-  }
-
-  // 如果有商品類別偏好數據，添加相應的分析
-  if (productPreferenceData) {
-    mockResult.productPreferenceAnalysis = "商品類別偏好分析顯示，您的品牌受眾最看重產品的品質和設計，其次是服務體驗。價格敏感度相對較低，表明您的客戶群體願意為優質產品和體驗支付溢價。建議強化這些優勢領域，並針對便利性方面進行改進。";
-  }
-
-  return mockResult;
-}
-
-// 從 AI 回應中提取高價值客群信息
-function extractHighValueSegments(lines) {
-  let segments = [];
-  let inSegmentsSection = false;
-  let currentSegment = null;
-
-  for (const line of lines) {
-    if (line.includes("高價值客群") || line.includes("highValueSegments")) {
-      inSegmentsSection = true;
-      continue;
-    }
-
-    if (inSegmentsSection && line.trim() !== '') {
-      // 嘗試識別一個新的客群開始
-      if (line.includes("客群") || line.includes("群體") || /^\d+\./.test(line)) {
-        if (currentSegment) {
-          segments.push(currentSegment);
-        }
-        currentSegment = {
-          name: line.replace(/^\d+\.\s*/, "").trim(),
-          description: "",
-          percentage: "15%",
-          stats: {
-            averageOrderValue: "¥3,500",
-            purchaseFrequency: "3.0次",
-            repurchaseRate: "75%"
-          }
-        };
-      } else if (currentSegment) {
-        // 將行添加到當前客群的描述中
-        currentSegment.description += " " + line.trim();
-      }
-    }
-
-    // 如果我們達到了下一個部分，退出客群識別
-    if (inSegmentsSection && (line.includes("行銷建議") || line.includes("marketingSuggestions"))) {
-      inSegmentsSection = false;
-      if (currentSegment) {
-        segments.push(currentSegment);
-      }
-      break;
-    }
-  }
-
-  // 確保最後一個客群也被添加
-  if (inSegmentsSection && currentSegment) {
-    segments.push(currentSegment);
-  }
-
-  return segments.length > 0 ? segments : null;
-}
-
-// 從 AI 回應中提取信息
-function extractInfo(lines, keyword) {
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].includes(keyword) && i + 1 < lines.length) {
-      return lines[i + 1].trim();
-    }
-  }
-  return `未能提取 ${keyword} 資訊`;
-}
-
-// 從 AI 回應中提取行銷建議
-function extractMarketingSuggestions(lines) {
-  const suggestions = [];
-  let inSuggestionsSection = false;
-
-  for (const line of lines) {
-    if (line.includes("行銷建議")) {
-      inSuggestionsSection = true;
-      continue;
-    }
-
-    if (inSuggestionsSection && line.trim() !== '') {
-      suggestions.push(line.trim());
-      if (suggestions.length >= 3) break;
-    }
-  }
-
-  return suggestions.length > 0 ? suggestions : ["針對您的目標受眾進行社交媒體行銷", "開發更符合主要客群需求的產品", "優化品牌訊息以吸引核心受眾"];
-}
-
 // 導入診斷工具
 import { checkOpenAICredentials, testOpenAICompletion, checkEnvironment } from './server/services/diagnostics.js';
 
@@ -611,22 +474,22 @@ app.get('/api/debug/status', (req, res) => {
 app.get('/api/debug/openai', async (req, res) => {
   try {
     console.log('運行 OpenAI API 診斷...');
-    
+
     // 收集環境信息
     const envInfo = checkEnvironment();
     console.log('環境信息:', envInfo);
-    
+
     // 檢查 API 金鑰
     console.log('檢查 API 金鑰...');
     const credentialsCheck = await checkOpenAICredentials();
-    
+
     // 只有當憑證有效時才測試完成 API
     let completionTest = { status: 'skipped', message: 'API 金鑰無效，跳過完成測試' };
     if (credentialsCheck.isValid) {
       console.log('API 金鑰有效，測試 OpenAI 完成 API...');
       completionTest = await testOpenAICompletion();
     }
-    
+
     // 返回詳細診斷報告
     res.json({
       timestamp: new Date().toISOString(),
@@ -652,13 +515,13 @@ app.get('/api/debug/openai', async (req, res) => {
 app.listen(port, '0.0.0.0', () => {
   console.log(`服務器運行在 http://0.0.0.0:${port}`);
   console.log(`API端點: http://0.0.0.0:${port}/api/analyze`);
-  console.log(`API调试端点: http://0.0.0.0:${port}/api/debug/status`);
+  console.log(`API调试端點: http://0.0.0.0:${port}/api/debug/status`);
   console.log(`當前環境變數: NODE_ENV=${process.env.NODE_ENV}`);
-  
+
   // 檢查OpenAI API金鑰
   const hasApiKey = !!process.env.OPENAI_API_KEY;
   console.log(`OpenAI API金鑰狀態: ${hasApiKey ? '已設置' : '未設置'}`);
-  
+
   if (!hasApiKey) {
     console.log('注意: 未設置OpenAI API金鑰，將使用模擬數據');
   }

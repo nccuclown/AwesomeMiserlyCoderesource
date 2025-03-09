@@ -1,5 +1,5 @@
-import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
+import OpenAI from 'openai';
 
 dotenv.config();
 
@@ -52,8 +52,8 @@ async function getAIAnalysis(
   productPreferenceData
 ) {
   // 首先檢查是否有 API KEY
-  if (!apiKey) {
-    console.log("[檢查點] 未設置 OpenAI API 金鑰，使用模擬數據");
+  if (!apiKey || !openai) {
+    console.log("[檢查點] 未設置 OpenAI API 金鑰或初始化失敗，使用模擬數據");
     return getMockAnalysis(
       brandName, 
       genderDistribution, 
@@ -101,13 +101,13 @@ ${timeSeriesData.age ? "年齡時間序列: " + JSON.stringify(timeSeriesData.ag
     // 準備調用 API
     console.log("[檢查點] 準備調用 OpenAI API...");
 
-    if (!openai) {
-      throw new Error("OpenAI 客戶端未初始化，無法進行 API 調用");
-    }
+    // 使用 gpt-4o-mini 模型
+    const model = "gpt-4o-mini";  
+    console.log(`[檢查點] 使用模型: ${model}`);
 
     // 調用 OpenAI API
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // 更新为 gpt-4o-mini 模型
+      model: model,
       messages: [
         {
           role: "system",
@@ -244,22 +244,22 @@ marketingSuggestions:
     }
 
     // 檢查是否為認證錯誤
-    if (error.message.includes('authentication') || 
+    if (error.message && (error.message.includes('authentication') || 
         error.message.includes('auth') || 
         error.message.includes('key') || 
-        error.message.includes('apiKey')) {
+        error.message.includes('apiKey'))) {
       throw new Error('OpenAI API 認證失敗，請檢查您的 API 金鑰是否有效。錯誤詳情: ' + error.message);
     }
 
     // 檢查是否為速率限制錯誤
-    if (error.message.includes('rate limit') || error.message.includes('429')) {
+    if (error.message && (error.message.includes('rate limit') || error.message.includes('429'))) {
       throw new Error('OpenAI API 請求頻率超限，請稍後再試。錯誤詳情: ' + error.message);
     }
 
     // 檢查是否為網絡連接錯誤
-    if (error.message.includes('ECONNREFUSED') || 
+    if (error.message && (error.message.includes('ECONNREFUSED') || 
         error.message.includes('ETIMEDOUT') || 
-        error.message.includes('network')) {
+        error.message.includes('network'))) {
       throw new Error('連接 OpenAI API 服務失敗，請檢查網絡連接。錯誤詳情: ' + error.message);
     }
 
