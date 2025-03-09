@@ -1,11 +1,10 @@
-
 import express from 'express';
 import multer from 'multer';
 import { parse } from 'csv-parse';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { Configuration, OpenAIApi } from 'openai';
+import openaiService from './services/openaiService.js'; // Import the new service
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,57 +31,57 @@ app.post('/api/analyze', upload.fields([
     const brandName = req.body.brandName;
     const brandDescription = req.body.brandDescription;
     const productInfo = req.body.productInfo;
-    
+
     // 初始化數據變量
     let genderData = null;
     let ageData = null;
     let productPrefData = null;
     let timeSeriesGenderData = null;
     let timeSeriesAgeData = null;
-    
+
     // 臨時文件路徑列表，用於後續清理
     const tempFiles = [];
-    
+
     // 處理性別分布文件
     if (req.files['genderFile']) {
       const genderFile = req.files['genderFile'][0];
       genderData = await parseCSVFile(genderFile.path);
       tempFiles.push(genderFile.path);
     }
-    
+
     // 處理年齡分布文件
     if (req.files['ageFile']) {
       const ageFile = req.files['ageFile'][0];
       ageData = await parseCSVFile(ageFile.path);
       tempFiles.push(ageFile.path);
     }
-    
+
     // 處理產品偏好文件
     if (req.files['productPrefFile']) {
       const productPrefFile = req.files['productPrefFile'][0];
       productPrefData = await parseCSVFile(productPrefFile.path);
       tempFiles.push(productPrefFile.path);
     }
-    
+
     // 處理性別時間序列文件
     if (req.files['timeSeriesGenderFile']) {
       const timeSeriesGenderFile = req.files['timeSeriesGenderFile'][0];
       timeSeriesGenderData = await parseCSVFile(timeSeriesGenderFile.path);
       tempFiles.push(timeSeriesGenderFile.path);
     }
-    
+
     // 處理年齡時間序列文件
     if (req.files['timeSeriesAgeFile']) {
       const timeSeriesAgeFile = req.files['timeSeriesAgeFile'][0];
       timeSeriesAgeData = await parseCSVFile(timeSeriesAgeFile.path);
       tempFiles.push(timeSeriesAgeFile.path);
     }
-    
+
     // 檢查基本數據是否可用
     if (!genderData && !ageData) {
       return res.status(400).json({ error: '請至少提供性別分布或年齡分布數據' });
     }
-    
+
     // 分析數據
     const analysisResult = await analyzeData(
       brandName, 
@@ -94,7 +93,7 @@ app.post('/api/analyze', upload.fields([
       timeSeriesGenderData,
       timeSeriesAgeData
     );
-    
+
     // 刪除所有臨時文件
     tempFiles.forEach(filePath => {
       try {
@@ -103,7 +102,7 @@ app.post('/api/analyze', upload.fields([
         console.error(`刪除臨時文件 ${filePath} 失敗:`, err);
       }
     });
-    
+
     // 返回分析結果
     res.json(analysisResult);
   } catch (error) {
@@ -116,7 +115,7 @@ app.post('/api/analyze', upload.fields([
 function parseCSVFile(filePath) {
   return new Promise((resolve, reject) => {
     const results = [];
-    
+
     fs.createReadStream(filePath)
       .pipe(parse({ columns: true, trim: true }))
       .on('data', (data) => results.push(data))
@@ -142,14 +141,14 @@ async function analyzeData(
     primary: getPrimaryCategory(genderData, '性別', '比例'),
     analysis: "根據數據，您的品牌受眾性別分布顯示..." // 這裡將被 AI 分析結果取代
   };
-  
+
   // 處理年齡數據
   const ageDistribution = {
     data: ageData,
     primaryAgeGroup: getPrimaryCategory(ageData, '年齡', '比例'),
     analysis: "根據數據，您的品牌受眾年齡分布顯示..." // 這裡將被 AI 分析結果取代
   };
-  
+
   // 處理商品類別偏好數據（如果有的話）
   let productPreferenceData = null;
   if (productPrefData && productPrefData.length > 0) {
@@ -162,19 +161,19 @@ async function analyzeData(
       analysis: "商品類別偏好數據顯示您的品牌受眾偏好..."
     };
   }
-  
+
   // 處理性別時間序列數據（如果有的話）
   let genderTimeSeriesData = null;
   if (timeSeriesGenderData && timeSeriesGenderData.length > 0) {
     genderTimeSeriesData = processTimeSeriesData(timeSeriesGenderData, '性別');
   }
-  
+
   // 處理年齡時間序列數據（如果有的話）
   let ageTimeSeriesData = null;
   if (timeSeriesAgeData && timeSeriesAgeData.length > 0) {
     ageTimeSeriesData = processTimeSeriesData(timeSeriesAgeData, '年齡');
   }
-  
+
   // 合併時間序列數據
   let timeSeriesData = null;
   if (genderTimeSeriesData || ageTimeSeriesData) {
@@ -184,10 +183,9 @@ async function analyzeData(
       analysis: "時間序列數據顯示您的品牌受眾消費行為隨時間的變化..."
     };
   }
-  
+
   // 使用 OpenAI API 進行更深入的分析
-  // 注意：您需要設置自己的 OpenAI API 密鑰
-  const openaiResult = await getAIAnalysis(
+  const openaiResult = await openaiService.getAIAnalysis(
     brandName, 
     brandDescription, 
     productInfo, 
@@ -196,7 +194,7 @@ async function analyzeData(
     timeSeriesData,
     productPreferenceData
   );
-  
+
   const result = {
     brandName,
     industryCategory: openaiResult.industryCategory,
@@ -234,7 +232,7 @@ async function analyzeData(
       }
     ]
   };
-  
+
   // 添加時間序列數據分析（如果有的話）
   if (timeSeriesData) {
     result.timeSeriesData = {
@@ -242,7 +240,7 @@ async function analyzeData(
       analysis: openaiResult.timeSeriesAnalysis || "時間序列數據顯示您的品牌受眾消費行為有季節性變化..."
     };
   }
-  
+
   // 添加商品類別偏好數據分析（如果有的話）
   if (productPreferenceData) {
     result.productPreferenceData = {
@@ -250,14 +248,14 @@ async function analyzeData(
       analysis: openaiResult.productPreferenceAnalysis || "商品類別偏好數據顯示您的品牌受眾更注重產品質量和設計..."
     };
   }
-  
+
   return result;
 }
 
 // 判斷是否為時間序列數據
 function isTimeSeriesData(data) {
   if (!data || data.length === 0) return false;
-  
+
   // 檢查是否包含日期字段
   return data[0].hasOwnProperty('日期') || data[0].hasOwnProperty('date');
 }
@@ -267,7 +265,7 @@ function processTimeSeriesData(data, categoryField) {
   const dateField = data[0].hasOwnProperty('日期') ? '日期' : 'date';
   const amountField = data[0].hasOwnProperty('平均訂單金額') ? '平均訂單金額' : 'amount';
   const categories = [...new Set(data.map(item => item[categoryField]))];
-  
+
   // 按日期分組
   const dateGroups = {};
   data.forEach(item => {
@@ -276,7 +274,7 @@ function processTimeSeriesData(data, categoryField) {
     }
     dateGroups[item[dateField]][item[categoryField]] = parseFloat(item[amountField]);
   });
-  
+
   // 轉換為圖表數據格式
   return Object.keys(dateGroups).map(date => {
     const entry = { name: date };
@@ -290,7 +288,7 @@ function processTimeSeriesData(data, categoryField) {
 // 判斷是否為商品類別偏好數據
 function isProductPreferenceData(data) {
   if (!data || data.length === 0) return false;
-  
+
   // 檢查是否包含商品類別和權重分數字段
   return data[0].hasOwnProperty('商品類別') || data[0].hasOwnProperty('category');
 }
@@ -299,7 +297,7 @@ function isProductPreferenceData(data) {
 function processProductPreferenceData(data) {
   const categoryField = data[0].hasOwnProperty('商品類別') ? '商品類別' : 'category';
   const scoreField = data[0].hasOwnProperty('權重分數') ? '權重分數' : 'score';
-  
+
   return data.map(item => ({
     category: item[categoryField],
     A: parseFloat(item[scoreField]),
@@ -310,10 +308,10 @@ function processProductPreferenceData(data) {
 // 獲取主要類別（性別或年齡組）
 function getPrimaryCategory(data, categoryField, valueField) {
   if (!data || data.length === 0) return "未知";
-  
+
   let maxValue = 0;
   let primaryCategory = "";
-  
+
   data.forEach(item => {
     const value = parseFloat(item[valueField]);
     if (value > maxValue) {
@@ -321,217 +319,10 @@ function getPrimaryCategory(data, categoryField, valueField) {
       primaryCategory = item[categoryField];
     }
   });
-  
+
   return primaryCategory;
 }
 
-// 使用 OpenAI API 進行分析
-async function getAIAnalysis(brandName, brandDescription, productInfo, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData) {
-  // 這裡需要設置您的 OpenAI API 密鑰
-  // 注意：實際生產環境中應使用環境變量
-  const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-  
-  // 如果沒有配置 API 密鑰，返回模擬數據
-  if (!process.env.OPENAI_API_KEY) {
-    console.warn('未設置 OpenAI API 密鑰，返回模擬數據');
-    return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
-  }
-  
-  const openai = new OpenAIApi(configuration);
-  
-  // 構建提示，包含所有可用的數據
-  let prompt = `
-    請你擔任資深市場分析師和品牌顧問，分析以下品牌資訊並提供詳細的受眾分析和行銷建議：
-    
-    品牌名稱：${brandName}
-    品牌簡介：${brandDescription}
-    產品資訊：${productInfo}
-    
-    性別分布數據：
-    ${JSON.stringify(genderDistribution.data)}
-    
-    年齡分布數據：
-    ${JSON.stringify(ageDistribution.data)}
-  `;
-  
-  // 添加時間序列數據（如果有的話）
-  if (timeSeriesData) {
-    prompt += `
-    時間序列消費行為數據：
-    ${JSON.stringify(timeSeriesData.gender)}
-    `;
-  }
-  
-  // 添加商品類別偏好數據（如果有的話）
-  if (productPreferenceData) {
-    prompt += `
-    商品類別偏好數據：
-    ${JSON.stringify(productPreferenceData.categories)}
-    `;
-  }
-  
-  prompt += `
-    請以JSON格式提供以下詳細分析：
-    1. "industryCategory": [行業類別]
-    2. "targetAudience": [目標受眾的詳細特徵描述]
-    3. "brandCharacteristics": [品牌特點摘要]
-    4. "genderAnalysis": [詳細的性別分布分析，包含洞察和趨勢]
-    5. "ageAnalysis": [詳細的年齡分布分析，包含洞察和趨勢]
-    6. "marketingSuggestions": [至少五點針對性的行銷建議數組]
-    7. "highValueSegments": [高價值客群識別和特徵描述，至少兩個客群]
-  `;
-  
-  // 添加時間序列和商品偏好分析請求（如果有相關數據）
-  if (timeSeriesData) {
-    prompt += `
-    8. "timeSeriesAnalysis": [消費行為時間趨勢分析]
-    `;
-  }
-  
-  if (productPreferenceData) {
-    prompt += `
-    9. "productPreferenceAnalysis": [商品類別偏好深度分析]
-    `;
-  }
-  
-  try {
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: prompt,
-      max_tokens: 2000,
-      temperature: 0.7,
-    });
-    
-    // 解析 AI 回應
-    const aiText = response.data.choices[0].text.trim();
-    
-    try {
-      // 嘗試解析 JSON 回應
-      // 尋找JSON開始的位置
-      const jsonStartIndex = aiText.indexOf('{');
-      if (jsonStartIndex !== -1) {
-        const jsonString = aiText.substring(jsonStartIndex);
-        const result = JSON.parse(jsonString);
-        return result;
-      } else {
-        // 如果無法找到 JSON，使用舊的解析方法
-        const lines = aiText.split('\n');
-        
-        return {
-          industryCategory: extractInfo(lines, "industryCategory") || extractInfo(lines, "行業類別"),
-          targetAudience: extractInfo(lines, "targetAudience") || extractInfo(lines, "目標受眾"),
-          brandCharacteristics: extractInfo(lines, "brandCharacteristics") || extractInfo(lines, "品牌特點"),
-          genderAnalysis: extractInfo(lines, "genderAnalysis") || extractInfo(lines, "性別分布分析"),
-          ageAnalysis: extractInfo(lines, "ageAnalysis") || extractInfo(lines, "年齡分布分析"),
-          marketingSuggestions: extractMarketingSuggestions(lines),
-          highValueSegments: extractHighValueSegments(lines)
-        };
-      }
-    } catch (parseError) {
-      console.error('解析 AI 回應為 JSON 時出錯:', parseError);
-      
-      // 回退到文本解析
-      const lines = aiText.split('\n');
-      
-      return {
-        industryCategory: extractInfo(lines, "industryCategory") || extractInfo(lines, "行業類別"),
-        targetAudience: extractInfo(lines, "targetAudience") || extractInfo(lines, "目標受眾"),
-        brandCharacteristics: extractInfo(lines, "brandCharacteristics") || extractInfo(lines, "品牌特點"),
-        genderAnalysis: extractInfo(lines, "genderAnalysis") || extractInfo(lines, "性別分布分析"),
-        ageAnalysis: extractInfo(lines, "ageAnalysis") || extractInfo(lines, "年齡分布分析"),
-        marketingSuggestions: extractMarketingSuggestions(lines),
-        highValueSegments: extractHighValueSegments(lines)
-      };
-    }
-  } catch (error) {
-    console.error('OpenAI API 調用錯誤:', error);
-    return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
-  }
-}
-
-// 從 AI 回應中提取高價值客群信息
-function extractHighValueSegments(lines) {
-  let segments = [];
-  let inSegmentsSection = false;
-  let currentSegment = null;
-  
-  for (const line of lines) {
-    if (line.includes("高價值客群") || line.includes("highValueSegments")) {
-      inSegmentsSection = true;
-      continue;
-    }
-    
-    if (inSegmentsSection && line.trim() !== '') {
-      // 嘗試識別一個新的客群開始
-      if (line.includes("客群") || line.includes("群體") || /^\d+\./.test(line)) {
-        if (currentSegment) {
-          segments.push(currentSegment);
-        }
-        currentSegment = {
-          name: line.replace(/^\d+\.\s*/, "").trim(),
-          description: "",
-          percentage: "15%",
-          stats: {
-            averageOrderValue: "¥3,500",
-            purchaseFrequency: "3.0次",
-            repurchaseRate: "75%"
-          }
-        };
-      } else if (currentSegment) {
-        // 將行添加到當前客群的描述中
-        currentSegment.description += " " + line.trim();
-      }
-    }
-    
-    // 如果我們達到了下一個部分，退出客群識別
-    if (inSegmentsSection && (line.includes("行銷建議") || line.includes("marketingSuggestions"))) {
-      inSegmentsSection = false;
-      if (currentSegment) {
-        segments.push(currentSegment);
-      }
-      break;
-    }
-  }
-  
-  // 確保最後一個客群也被添加
-  if (inSegmentsSection && currentSegment) {
-    segments.push(currentSegment);
-  }
-  
-  return segments.length > 0 ? segments : null;
-}
-
-// 從 AI 回應中提取信息
-function extractInfo(lines, keyword) {
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].includes(keyword) && i + 1 < lines.length) {
-      return lines[i + 1].trim();
-    }
-  }
-  return `未能提取 ${keyword} 資訊`;
-}
-
-// 從 AI 回應中提取行銷建議
-function extractMarketingSuggestions(lines) {
-  const suggestions = [];
-  let inSuggestionsSection = false;
-  
-  for (const line of lines) {
-    if (line.includes("行銷建議")) {
-      inSuggestionsSection = true;
-      continue;
-    }
-    
-    if (inSuggestionsSection && line.trim() !== '') {
-      suggestions.push(line.trim());
-      if (suggestions.length >= 3) break;
-    }
-  }
-  
-  return suggestions.length > 0 ? suggestions : ["針對您的目標受眾進行社交媒體行銷", "開發更符合主要客群需求的產品", "優化品牌訊息以吸引核心受眾"];
-}
 
 // 模擬 AI 分析結果（當沒有 OpenAI API 密鑰時使用）
 function getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData) {
@@ -571,18 +362,100 @@ function getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSer
       }
     ]
   };
-  
+
   // 如果有時間序列數據，添加相應的分析
   if (timeSeriesData) {
     mockResult.timeSeriesAnalysis = "消費行為時間趨勢分析顯示，您的品牌受眾在節假日期間消費明顯增加，女性消費者在促銷活動期間的響應度高於男性。此外，年初和年末是消費高峰期，建議在這些時間點加強行銷力度。";
   }
-  
+
   // 如果有商品類別偏好數據，添加相應的分析
   if (productPreferenceData) {
     mockResult.productPreferenceAnalysis = "商品類別偏好分析顯示，您的品牌受眾最看重產品的品質和設計，其次是服務體驗。價格敏感度相對較低，表明您的客戶群體願意為優質產品和體驗支付溢價。建議強化這些優勢領域，並針對便利性方面進行改進。";
   }
-  
+
   return mockResult;
+}
+
+// 從 AI 回應中提取高價值客群信息
+function extractHighValueSegments(lines) {
+  let segments = [];
+  let inSegmentsSection = false;
+  let currentSegment = null;
+
+  for (const line of lines) {
+    if (line.includes("高價值客群") || line.includes("highValueSegments")) {
+      inSegmentsSection = true;
+      continue;
+    }
+
+    if (inSegmentsSection && line.trim() !== '') {
+      // 嘗試識別一個新的客群開始
+      if (line.includes("客群") || line.includes("群體") || /^\d+\./.test(line)) {
+        if (currentSegment) {
+          segments.push(currentSegment);
+        }
+        currentSegment = {
+          name: line.replace(/^\d+\.\s*/, "").trim(),
+          description: "",
+          percentage: "15%",
+          stats: {
+            averageOrderValue: "¥3,500",
+            purchaseFrequency: "3.0次",
+            repurchaseRate: "75%"
+          }
+        };
+      } else if (currentSegment) {
+        // 將行添加到當前客群的描述中
+        currentSegment.description += " " + line.trim();
+      }
+    }
+
+    // 如果我們達到了下一個部分，退出客群識別
+    if (inSegmentsSection && (line.includes("行銷建議") || line.includes("marketingSuggestions"))) {
+      inSegmentsSection = false;
+      if (currentSegment) {
+        segments.push(currentSegment);
+      }
+      break;
+    }
+  }
+
+  // 確保最後一個客群也被添加
+  if (inSegmentsSection && currentSegment) {
+    segments.push(currentSegment);
+  }
+
+  return segments.length > 0 ? segments : null;
+}
+
+// 從 AI 回應中提取信息
+function extractInfo(lines, keyword) {
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes(keyword) && i + 1 < lines.length) {
+      return lines[i + 1].trim();
+    }
+  }
+  return `未能提取 ${keyword} 資訊`;
+}
+
+// 從 AI 回應中提取行銷建議
+function extractMarketingSuggestions(lines) {
+  const suggestions = [];
+  let inSuggestionsSection = false;
+
+  for (const line of lines) {
+    if (line.includes("行銷建議")) {
+      inSuggestionsSection = true;
+      continue;
+    }
+
+    if (inSuggestionsSection && line.trim() !== '') {
+      suggestions.push(line.trim());
+      if (suggestions.length >= 3) break;
+    }
+  }
+
+  return suggestions.length > 0 ? suggestions : ["針對您的目標受眾進行社交媒體行銷", "開發更符合主要客群需求的產品", "優化品牌訊息以吸引核心受眾"];
 }
 
 // 啟動服務器

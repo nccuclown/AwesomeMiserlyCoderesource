@@ -92,7 +92,6 @@ const BrandInfoForm = ({ onSubmit }) => {
   );
 };
 
-export default BrandInfoForm;
 import { useState } from 'react';
 
 function BrandInfoForm({ onSubmit }) {
