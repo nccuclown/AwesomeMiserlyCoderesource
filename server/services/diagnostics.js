@@ -1,4 +1,140 @@
 
+import { OpenAI } from 'openai';
+import dotenv from 'dotenv';
+import fs from 'fs';
+
+// 載入環境變數
+dotenv.config();
+
+/**
+ * 檢查環境信息
+ */
+export function checkEnvironment() {
+  // 檢查 Node.js 版本
+  const nodeVersion = process.version;
+  const osType = process.platform;
+  const memory = process.memoryUsage();
+  
+  return {
+    nodeVersion,
+    osType,
+    memory: {
+      rss: `${Math.round(memory.rss / 1024 / 1024)} MB`,
+      heapTotal: `${Math.round(memory.heapTotal / 1024 / 1024)} MB`,
+      heapUsed: `${Math.round(memory.heapUsed / 1024 / 1024)} MB`,
+    },
+    environment: process.env.NODE_ENV || 'development',
+  };
+}
+
+/**
+ * 檢查 OpenAI API 金鑰
+ */
+export async function checkOpenAICredentials() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  
+  // 檢查 API 金鑰是否存在
+  if (!apiKey) {
+    console.log('OpenAI API 金鑰未設置');
+    return {
+      isValid: false,
+      message: 'API 金鑰未設置，請在環境變數中設置 OPENAI_API_KEY',
+      keyLength: 0
+    };
+  }
+  
+  console.log(`API 金鑰已設置，長度為 ${apiKey.length}`);
+  console.log(`API 金鑰前綴: ${apiKey.substring(0, 5)}...`);
+  
+  // 檢查 API 金鑰格式
+  const isValidFormat = /^sk-[a-zA-Z0-9]{48,}$/.test(apiKey);
+  if (!isValidFormat) {
+    console.log('API 金鑰格式不正確');
+    return {
+      isValid: false,
+      message: 'API 金鑰格式不正確，應為 sk- 開頭的字符串',
+      keyLength: apiKey.length
+    };
+  }
+  
+  return {
+    isValid: true,
+    message: 'API 金鑰格式有效',
+    keyLength: apiKey.length
+  };
+}
+
+/**
+ * 測試 OpenAI Completion API
+ */
+export async function testOpenAICompletion() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  
+  if (!apiKey) {
+    return {
+      status: 'error',
+      message: 'API 金鑰未設置'
+    };
+  }
+  
+  try {
+    console.log('測試 OpenAI API 連接...');
+    const openai = new OpenAI({ apiKey });
+    
+    const startTime = Date.now();
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: '你是一個幫助測試 API 連接的助手。' },
+        { role: 'user', content: '請返回一個簡短的回應來確認 API 工作正常。' }
+      ],
+      max_tokens: 50
+    });
+    const endTime = Date.now();
+    
+    console.log('OpenAI API 測試成功，響應時間:', endTime - startTime, 'ms');
+    return {
+      status: 'success',
+      message: '成功連接到 OpenAI API',
+      response: {
+        model: response.model,
+        content: response.choices[0].message.content,
+        responseTimeMs: endTime - startTime
+      }
+    };
+  } catch (error) {
+    console.error('OpenAI API 測試失敗:', error.message);
+    console.error('錯誤訊息:', error.message);
+    console.error('錯誤詳情:', JSON.stringify(error, null, 2));
+    
+    if (error.response) {
+      console.error('API 響應狀態:', error.response.status);
+      console.error('API 錯誤訊息:', error.response.data);
+    }
+    
+    let errorMessage = 'API 連接失敗';
+    
+    // 分析常見錯誤
+    if (error.message.includes('authentication')) {
+      errorMessage = 'API 金鑰認證失敗';
+    } else if (error.message.includes('rate limit')) {
+      errorMessage = 'API 請求頻率超限';
+    } else if (error.message.includes('network')) {
+      errorMessage = '網絡連接失敗';
+    }
+    
+    return {
+      status: 'error',
+      message: errorMessage,
+      error: {
+        message: error.message,
+        type: error.constructor.name
+      }
+    };
+  }
+}
+
+
 import fs from 'fs';
 import dotenv from 'dotenv';
 import { OpenAI } from 'openai';

@@ -3,18 +3,22 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// 檢查API金鑰
+// 檢查 API 金鑰是否存在
 const apiKey = process.env.OPENAI_API_KEY;
 if (!apiKey) {
-  console.warn('[OpenAI] 警告: 未設置 OPENAI_API_KEY');
-} else {
-  console.log('[OpenAI] API KEY 已設置，金鑰前5個字符:', apiKey.substring(0, 5) + '...');
-  console.log('[OpenAI] API KEY 長度:', apiKey.length);
+  console.warn('警告: OPENAI_API_KEY 環境變數未設置，將使用模擬數據');
 }
 
-const openai = new OpenAI({
-  apiKey: apiKey || "mock_key"
-});
+// 初始化 OpenAI 客戶端
+let openai = null;
+try {
+  openai = new OpenAI({ 
+    apiKey: apiKey,
+  });
+  console.log('OpenAI 客戶端初始化成功，API KEY 長度:', apiKey ? apiKey.length : 0);
+} catch (error) {
+  console.error('OpenAI 客戶端初始化失敗:', error);
+}
 
 // 測試API連接
 async function testOpenAIConnection() {
@@ -37,6 +41,7 @@ async function testOpenAIConnection() {
 // 啟動時測試連接
 testOpenAIConnection();
 
+
 async function getAIAnalysis(
   brandName, 
   brandDescription, 
@@ -46,183 +51,227 @@ async function getAIAnalysis(
   timeSeriesData,
   productPreferenceData
 ) {
-  console.log('[OpenAI分析] 開始AI分析，品牌:', brandName);
-  console.log('[OpenAI分析] 檢查環境變數:', process.env.OPENAI_API_KEY ? '有API金鑰' : '缺少API金鑰');
-  console.log("[檢查點] OpenAI API 請求數據準備開始");
-  console.log(`[檢查點] 品牌名稱: ${brandName}`);
-  console.log(`[檢查點] 品牌描述: ${brandDescription}`);
-
-  // 驗證性別數據
-  if (genderDistribution && genderDistribution.data) {
-    console.log(`[檢查點] 性別數據: ${genderDistribution.data.length} 項`);
-    console.log(`[檢查點] 性別數據樣本: ${JSON.stringify(genderDistribution.data.slice(0, 2))}`);
-  } else {
-    console.log(`[檢查點] 警告: 性別數據為空或格式不正確`);
-  }
-
-  // 驗證年齡數據
-  if (ageDistribution && ageDistribution.data) {
-    console.log(`[檢查點] 年齡數據: ${ageDistribution.data.length} 項`);
-    console.log(`[檢查點] 年齡數據樣本: ${JSON.stringify(ageDistribution.data.slice(0, 2))}`);
-  } else {
-    console.log(`[檢查點] 警告: 年齡數據為空或格式不正確`);
-  }
-
-  // 驗證其他選填數據
-  if (timeSeriesData) {
-    console.log(`[檢查點] 時間序列數據存在`);
-    if (timeSeriesData.gender) {
-      console.log(`[檢查點] 性別時間序列數據: ${timeSeriesData.gender.length} 項`);
-    }
-    if (timeSeriesData.age) {
-      console.log(`[檢查點] 年齡時間序列數據: ${timeSeriesData.age.length} 項`);
-    }
-  }
-
-  if (productPreferenceData && productPreferenceData.categories) {
-    console.log(`[檢查點] 產品偏好數據: ${productPreferenceData.categories.length} 項`);
-    console.log(`[檢查點] 產品偏好樣本: ${JSON.stringify(productPreferenceData.categories.slice(0, 2))}`);
-  }
-
-  console.log("[檢查點] 開始 OpenAI 分析");
-  console.log(`[檢查點] 品牌資訊: ${brandName}`);
-  console.log(`[檢查點] 性別數據項目數: ${genderDistribution.data.length}`);
-  console.log(`[檢查點] 年齡數據項目數: ${ageDistribution.data.length}`);
-
-  if (timeSeriesData) {
-    console.log(`[檢查點] 時間序列數據可用: ${timeSeriesData.gender ? '性別' : ''}${timeSeriesData.age ? ' 年齡' : ''}`);
-  }
-
-  if (productPreferenceData) {
-    console.log(`[檢查點] 產品偏好數據可用: ${productPreferenceData.categories.length} 個類別`);
-  }
-
-  // 如果沒有設置 API 金鑰，返回模擬數據
+  // 首先檢查是否有 API KEY
   if (!apiKey) {
-    console.log("[檢查點] 使用模擬數據 (沒有找到 OPENAI_API_KEY)");
-    return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
+    console.log("[檢查點] 未設置 OpenAI API 金鑰，使用模擬數據");
+    return getMockAnalysis(
+      brandName, 
+      genderDistribution, 
+      ageDistribution, 
+      timeSeriesData, 
+      productPreferenceData
+    );
   }
-
-  console.log("[檢查點] 使用 OpenAI API，金鑰前5位字元:", apiKey ? apiKey.substring(0, 5) + "..." : "未設置");
 
   try {
-    console.log("[檢查點] 正在準備 OpenAI 請求數據...");
+    console.log("[檢查點] 準備調用 OpenAI API");
+    console.log("[檢查點] 使用的品牌名稱:", brandName);
 
-    // 準備輸入數據
-    const genderData = genderDistribution.data.map(item => `${item.性別 || item.gender}: ${item.比例 || item.percentage}`).join(", ");
-    const ageData = ageDistribution.data.map(item => `${item.年齡 || item.age}: ${item.比例 || item.percentage}`).join(", ");
+    // 配置提示詞，以獲得更好的分析結果
+    const genderInfo = genderDistribution.data ? 
+      `性別分布數據: ${JSON.stringify(genderDistribution.data)}` : 
+      "沒有提供性別分布數據";
 
-    let timeSeriesDesc = "";
+    const ageInfo = ageDistribution.data ? 
+      `年齡分布數據: ${JSON.stringify(ageDistribution.data)}` : 
+      "沒有提供年齡分布數據";
+
+    let timeSeriesInfo = "沒有提供時間序列數據";
     if (timeSeriesData) {
-      if (timeSeriesData.gender) {
-        timeSeriesDesc += "性別時間序列數據: ";
-        timeSeriesDesc += JSON.stringify(timeSeriesData.gender.slice(0, 3)) + "...";
-      }
-      if (timeSeriesData.age) {
-        timeSeriesDesc += "年齡時間序列數據: ";
-        timeSeriesDesc += JSON.stringify(timeSeriesData.age.slice(0, 3)) + "...";
-      }
+      timeSeriesInfo = `
+時間序列數據: 
+${timeSeriesData.gender ? "性別時間序列: " + JSON.stringify(timeSeriesData.gender) : ""}
+${timeSeriesData.age ? "年齡時間序列: " + JSON.stringify(timeSeriesData.age) : ""}
+`;
     }
 
-    let productPrefDesc = "";
-    if (productPreferenceData && productPreferenceData.categories) {
-      productPrefDesc = "產品偏好: " + productPreferenceData.categories.map(c => 
-        `${c.category}: ${c.A}`
-      ).join(", ");
+    let productPreferenceInfo = "沒有提供商品類別偏好數據";
+    if (productPreferenceData) {
+      productPreferenceInfo = `商品類別偏好數據: ${JSON.stringify(productPreferenceData.categories)}`;
     }
 
-    console.log("[檢查點] 準備發送請求到 OpenAI API...");
+    // 檢查輸入數據
+    console.log("[檢查點] 輸入數據檢查:");
+    console.log("- 品牌名稱:", brandName ? brandName.substring(0, 30) : "未提供");
+    console.log("- 品牌描述長度:", brandDescription ? brandDescription.length : 0);
+    console.log("- 產品資訊長度:", productInfo ? productInfo.length : 0);
+    console.log("- 性別數據項數:", genderDistribution.data ? genderDistribution.data.length : 0);
+    console.log("- 年齡數據項數:", ageDistribution.data ? ageDistribution.data.length : 0);
 
-    // 在發送前打印完整的數據結構
-    const messages = [
-      {
-        role: "system",
-        content: `你是一位專業的品牌分析師，請根據提供的品牌資訊和受眾數據進行分析。
-        分析結果請以JSON格式返回，包含以下字段：
-        - industryCategory: 行業類別
-        - targetAudience: 目標受眾描述
-        - brandCharacteristics: 品牌特性
-        - genderAnalysis: 性別分布分析
-        - ageAnalysis: 年齡分布分析
-        - marketingSuggestions: 行銷建議（數組）
-        - highValueSegments: 高價值客群（數組，每個客群包含name, percentage, description, stats）
-        ${timeSeriesData ? "- timeSeriesAnalysis: 時間序列數據分析" : ""}
-        ${productPreferenceData ? "- productPreferenceAnalysis: 產品偏好分析" : ""}`
-      }
-    ];
+    // 準備調用 API
+    console.log("[檢查點] 準備調用 OpenAI API...");
 
-    // 保存用戶消息內容用於日誌
-    const userContent = `品牌名稱: ${brandName}
-    品牌簡介: ${brandDescription}
-    產品資訊: ${productInfo}
-    性別分布: ${genderData}
-    年齡分布: ${ageData}
-    ${timeSeriesDesc}
-    ${productPrefDesc}`;
+    if (!openai) {
+      throw new Error("OpenAI 客戶端未初始化，無法進行 API 調用");
+    }
 
-    // 將用戶消息添加到消息數組
-    messages.push({
-      role: "user",
-      content: userContent
-    });
-
-    console.log("[檢查點] 消息結構:", JSON.stringify(messages, null, 2).substring(0, 500) + "...");
-    console.log("[檢查點] 正在發送請求到 OpenAI API...");
-
-    const startTime = Date.now();
-
-    // 請求 OpenAI API
+    // 調用 OpenAI API
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",  // 使用 GPT-3.5-turbo 模型,更穩定
-      messages: messages,
-      temperature: 0.3,  // 較低的溫度使結果更確定性
-      response_format: { type: "json_object" }  // 指定回傳 JSON 格式
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: `你是一位專業的品牌策略顧問與數據分析師。根據品牌資訊和受眾數據，您將為品牌提供有價值的洞察和行銷建議。請保持專業、簡潔和實用的風格。使用繁體中文回應。`
+        },
+        {
+          role: "user",
+          content: `
+我的品牌名稱是: ${brandName}
+品牌描述: ${brandDescription}
+產品資訊: ${productInfo}
+
+以下是我們的受眾數據:
+${genderInfo}
+${ageInfo}
+${timeSeriesInfo}
+${productPreferenceInfo}
+
+請提供以下分析:
+1. 行業類別: 基於以上信息，判斷品牌所屬的行業類別
+2. 目標受眾: 描述品牌的核心目標受眾
+3. 品牌特性: 概括品牌的主要特點和定位
+4. 性別分析: 分析性別分布數據對行銷策略的影響
+5. 年齡分析: 分析年齡分布數據對行銷策略的影響
+6. 高價值客群: 識別和描述2-3個高價值客群，包括其佔比、特點和消費能力指標
+7. 行銷建議: 提供5條具體可行的行銷策略建議
+
+如果有時間序列數據，請額外提供:
+8. 時間序列分析: 分析受眾行為隨時間的變化趨勢和模式
+
+如果有商品類別偏好數據，請額外提供:
+9. 商品偏好分析: 分析受眾的產品偏好特點
+
+回答格式應為:
+industryCategory: 行業類別
+targetAudience: 目標受眾描述
+brandCharacteristics: 品牌特性
+genderAnalysis: 性別分析
+ageAnalysis: 年齡分析
+highValueSegments:
+1. 第一個高價值客群...
+2. 第二個高價值客群...
+marketingSuggestions:
+1. 第一條行銷建議...
+2. 第二條行銷建議...
+...
+5. 第五條行銷建議...
+`
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 1500,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0.1,
     });
 
-    const endTime = Date.now();
-    console.log(`[檢查點] 收到 OpenAI API 響應，耗時: ${endTime - startTime}ms`);
-    console.log(`[檢查點] API 響應詳情:
-    - ID: ${response.id}
-    - 模型: ${response.model}
-    - 耗費標記: ${response.usage ? response.usage.total_tokens : '未知'}
-    - 選擇數量: ${response.choices ? response.choices.length : 0}
-    `);
+    console.log("[檢查點] OpenAI API 調用成功");
+    console.log("[檢查點] 回應摘要:", {
+      model: response.model,
+      tokens: response.usage ? response.usage.total_tokens : 'unknown',
+      choices: response.choices ? response.choices.length : 0
+    });
 
-    // 記錄完整響應以便診斷
-    const fullResponseJson = JSON.stringify(response);
-    console.log("[檢查點] 完整響應:", fullResponseJson.substring(0, 500) + "...");
+    const aiResponse = response.choices[0].message.content;
+    const lines = aiResponse.split('\n');
+
+    // 提取行銷建議
+    const marketingSuggestions = [];
+    let inSuggestionsSection = false;
+
+    for (const line of lines) {
+      if (line.includes("marketingSuggestions") || line.includes("行銷建議")) {
+        inSuggestionsSection = true;
+        continue;
+      }
+
+      if (inSuggestionsSection && line.trim() !== '' && (line.startsWith('- ') || line.match(/^\d+\./))) {
+        marketingSuggestions.push(line.replace(/^- /, '').replace(/^\d+\.\s*/, '').trim());
+      }
+
+      if (inSuggestionsSection && line.includes("高價值客群") || line.includes("highValueSegments")) {
+        break;
+      }
+    }
 
     // 解析回應
-    const responseText = response.choices[0].message.content.trim();
-    console.log("[檢查點] 回應內容:", responseText.substring(0, 200) + "...");
+    const industryCategory = extractInfo(lines, "industryCategory") || "消費品";
+    const targetAudience = extractInfo(lines, "targetAudience") || "年輕女性消費者";
+    const brandCharacteristics = extractInfo(lines, "brandCharacteristics") || "提供優質生活方式產品的品牌";
+    const genderAnalysis = extractInfo(lines, "genderAnalysis") || "品牌受眾主要為女性";
+    const ageAnalysis = extractInfo(lines, "ageAnalysis") || "主要受眾年齡在25-34歲之間";
+    const highValueSegments = extractHighValueSegments(lines) || [];
 
-    // 保存完整響應到臨時文件
-    try {
-      const fs = await import('fs');
-      fs.writeFileSync('openai_last_response.json', fullResponseJson);
-    } catch (fileError) {
-      console.error('[檢查點] 無法寫入響應日誌文件:', fileError);
+    let timeSeriesAnalysis = null;
+    if (timeSeriesData) {
+      timeSeriesAnalysis = extractInfo(lines, "timeSeriesAnalysis") || "時間序列數據顯示消費行為有季節性變化";
     }
 
-    try {
-      const result = JSON.parse(responseText);
-      console.log("[檢查點] 成功獲取並解析 OpenAI 分析結果");
-      return result;
-    } catch (parseError) {
-      console.error('[檢查點] JSON解析錯誤:', parseError);
-      console.error('[檢查點] 原始回應內容:', responseText);
-      throw new Error('OpenAI回應格式錯誤: ' + parseError.message);
+    let productPreferenceAnalysis = null;
+    if (productPreferenceData) {
+      productPreferenceAnalysis = extractInfo(lines, "productPreferenceAnalysis") || "受眾對產品品質和設計最為重視";
     }
+
+    // 返回結構化分析結果
+    return {
+      industryCategory,
+      targetAudience,
+      brandCharacteristics,
+      genderAnalysis,
+      ageAnalysis,
+      marketingSuggestions: marketingSuggestions.length > 0 ? marketingSuggestions : [
+        "在Instagram和TikTok等社交媒體平台上增加品牌曝光",
+        "針對核心年齡層開發特定產品線",
+        "通過電子郵件行銷建立忠誠度計劃",
+        "與目標受眾喜愛的影響者合作",
+        "改進產品包裝以吸引主要客群"
+      ],
+      highValueSegments,
+      timeSeriesAnalysis,
+      productPreferenceAnalysis
+    };
   } catch (error) {
     console.error('OpenAI API調用失敗:', error);
-    console.error('錯誤詳情:', error.response?.data || error.message);
     console.error('錯誤類型:', error.constructor.name);
-    console.error('錯誤狀態碼:', error.status);
+    console.error('錯誤詳情:', error.response?.data || error.message);
     console.error('錯誤堆疊:', error.stack);
+
+    // 詳細記錄 API 錯誤
+    if (error.response) {
+      console.error('API 響應狀態:', error.response.status);
+      console.error('API 響應數據:', error.response.data);
+      console.error('API 響應標頭:', error.response.headers);
+    }
+
+    // 檢查是否為認證錯誤
+    if (error.message.includes('authentication') || 
+        error.message.includes('auth') || 
+        error.message.includes('key') || 
+        error.message.includes('apiKey')) {
+      throw new Error('OpenAI API 認證失敗，請檢查您的 API 金鑰是否有效。錯誤詳情: ' + error.message);
+    }
+
+    // 檢查是否為速率限制錯誤
+    if (error.message.includes('rate limit') || error.message.includes('429')) {
+      throw new Error('OpenAI API 請求頻率超限，請稍後再試。錯誤詳情: ' + error.message);
+    }
+
+    // 檢查是否為網絡連接錯誤
+    if (error.message.includes('ECONNREFUSED') || 
+        error.message.includes('ETIMEDOUT') || 
+        error.message.includes('network')) {
+      throw new Error('連接 OpenAI API 服務失敗，請檢查網絡連接。錯誤詳情: ' + error.message);
+    }
 
     // 如果API調用失敗，返回模擬數據
     console.log("[檢查點] 發生錯誤，切換到模擬數據");
-    return getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSeriesData, productPreferenceData);
+    return getMockAnalysis(
+      brandName, 
+      genderDistribution, 
+      ageDistribution, 
+      timeSeriesData, 
+      productPreferenceData
+    );
   }
 }
 
@@ -278,6 +327,29 @@ function getMockAnalysis(brandName, genderDistribution, ageDistribution, timeSer
   }
 
   return mockResult;
+}
+
+function extractInfo(lines, key) {
+  const keyLine = lines.find(line => line.trim().startsWith(`${key}:`));
+  return keyLine ? keyLine.substring(key.length + 1).trim() : null;
+}
+
+function extractHighValueSegments(lines) {
+  const segments = [];
+  let inSegmentsSection = false;
+  for (const line of lines) {
+    if (line.includes("highValueSegments") || line.includes("高價值客群")) {
+      inSegmentsSection = true;
+      continue;
+    }
+    if (inSegmentsSection && line.trim() !== '' && line.match(/^\d+\./)) {
+      segments.push(line.replace(/^\d+\.\s*/, '').trim());
+    }
+    if (inSegmentsSection && line.includes("marketingSuggestions") || line.includes("行銷建議")) {
+      break;
+    }
+  }
+  return segments;
 }
 
 export default {

@@ -46,6 +46,11 @@ app.use((err, req, res, next) => {
       error: `伺服器錯誤: ${err.message}`,
       stack: process.env.NODE_ENV === 'production' ? null : err.stack,
       type: err.name || 'Error',
+
+// Express JSON 解析中間件
+app.use(express.json());
+
+
       timestamp: new Date().toISOString()
     };
     
