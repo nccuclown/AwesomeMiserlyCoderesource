@@ -104,9 +104,18 @@ export default function App() {
     <main className="app-container">
       <h1>品牌受眾分析工具</h1>
       <div className="step-indicator">
-        <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>1. 品牌資訊</div>
-        <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>2. 上傳數據</div>
-        <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>3. 分析結果</div>
+        <div className={`step ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`}>
+          <div className="step-circle">1</div>
+          <div className="step-label">品牌資訊</div>
+        </div>
+        <div className={`step ${currentStep >= 2 ? 'active' : ''} ${currentStep > 2 ? 'completed' : ''}`}>
+          <div className="step-circle">2</div>
+          <div className="step-label">上傳數據</div>
+        </div>
+        <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>
+          <div className="step-circle">3</div>
+          <div className="step-label">分析結果</div>
+        </div>
       </div>
       {renderStep()}
     </main>
