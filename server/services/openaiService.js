@@ -131,54 +131,86 @@ async function getAIAnalysis(
       ).join(", ");
     }
 
-    console.log("[檢查點] 發送請求到 OpenAI API...");
+    console.log("[檢查點] 準備發送請求到 OpenAI API...");
+
+    // 在發送前打印完整的數據結構
+    const messages = [
+      {
+        role: "system",
+        content: `你是一位專業的品牌分析師，請根據提供的品牌資訊和受眾數據進行分析。
+        分析結果請以JSON格式返回，包含以下字段：
+        - industryCategory: 行業類別
+        - targetAudience: 目標受眾描述
+        - brandCharacteristics: 品牌特性
+        - genderAnalysis: 性別分布分析
+        - ageAnalysis: 年齡分布分析
+        - marketingSuggestions: 行銷建議（數組）
+        - highValueSegments: 高價值客群（數組，每個客群包含name, percentage, description, stats）
+        ${timeSeriesData ? "- timeSeriesAnalysis: 時間序列數據分析" : ""}
+        ${productPreferenceData ? "- productPreferenceAnalysis: 產品偏好分析" : ""}`
+      }
+    ];
+
+    // 保存用戶消息內容用於日誌
+    const userContent = `品牌名稱: ${brandName}
+    品牌簡介: ${brandDescription}
+    產品資訊: ${productInfo}
+    性別分布: ${genderData}
+    年齡分布: ${ageData}
+    ${timeSeriesDesc}
+    ${productPrefDesc}`;
+
+    // 將用戶消息添加到消息數組
+    messages.push({
+      role: "user",
+      content: userContent
+    });
+
+    console.log("[檢查點] 消息結構:", JSON.stringify(messages, null, 2).substring(0, 500) + "...");
+    console.log("[檢查點] 正在發送請求到 OpenAI API...");
+
+    const startTime = Date.now();
 
     // 請求 OpenAI API
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",  // 使用 GPT-3.5-turbo 模型,更穩定
-      messages: [
-        {
-          role: "system",
-          content: `你是一位專業的品牌分析師，請根據提供的品牌資訊和受眾數據進行分析。
-          分析結果請以JSON格式返回，包含以下字段：
-          - industryCategory: 行業類別
-          - targetAudience: 目標受眾描述
-          - brandCharacteristics: 品牌特性
-          - genderAnalysis: 性別分布分析
-          - ageAnalysis: 年齡分布分析
-          - marketingSuggestions: 行銷建議（數組）
-          - highValueSegments: 高價值客群（數組，每個客群包含name, percentage, description, stats）
-          ${timeSeriesData ? "- timeSeriesAnalysis: 時間序列數據分析" : ""}
-          ${productPreferenceData ? "- productPreferenceAnalysis: 產品偏好分析" : ""}`
-        },
-        {
-          role: "user",
-          content: `品牌名稱: ${brandName}
-          品牌簡介: ${brandDescription}
-          產品資訊: ${productInfo}
-          性別分布: ${genderData}
-          年齡分布: ${ageData}
-          ${timeSeriesDesc}
-          ${productPrefDesc}`
-        }
-      ],
+      messages: messages,
       temperature: 0.3,  // 較低的溫度使結果更確定性
       response_format: { type: "json_object" }  // 指定回傳 JSON 格式
     });
 
-    console.log("[檢查點] 收到 OpenAI API 響應");
+    const endTime = Date.now();
+    console.log(`[檢查點] 收到 OpenAI API 響應，耗時: ${endTime - startTime}ms`);
+    console.log(`[檢查點] API 響應詳情:
+    - ID: ${response.id}
+    - 模型: ${response.model}
+    - 耗費標記: ${response.usage ? response.usage.total_tokens : '未知'}
+    - 選擇數量: ${response.choices ? response.choices.length : 0}
+    `);
 
-    // 提取並返回分析結果
-    const content = response.choices[0].message.content;
-    console.log("[檢查點] OpenAI 回應內容:", content.substring(0, 200) + '...');
+    // 記錄完整響應以便診斷
+    const fullResponseJson = JSON.stringify(response);
+    console.log("[檢查點] 完整響應:", fullResponseJson.substring(0, 500) + "...");
+
+    // 解析回應
+    const responseText = response.choices[0].message.content.trim();
+    console.log("[檢查點] 回應內容:", responseText.substring(0, 200) + "...");
+
+    // 保存完整響應到臨時文件
+    try {
+      const fs = await import('fs');
+      fs.writeFileSync('openai_last_response.json', fullResponseJson);
+    } catch (fileError) {
+      console.error('[檢查點] 無法寫入響應日誌文件:', fileError);
+    }
 
     try {
-      const result = JSON.parse(content);
+      const result = JSON.parse(responseText);
       console.log("[檢查點] 成功獲取並解析 OpenAI 分析結果");
       return result;
     } catch (parseError) {
       console.error('[檢查點] JSON解析錯誤:', parseError);
-      console.error('[檢查點] 原始回應內容:', content);
+      console.error('[檢查點] 原始回應內容:', responseText);
       throw new Error('OpenAI回應格式錯誤: ' + parseError.message);
     }
   } catch (error) {

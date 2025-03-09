@@ -586,7 +586,10 @@ function extractMarketingSuggestions(lines) {
   return suggestions.length > 0 ? suggestions : ["針對您的目標受眾進行社交媒體行銷", "開發更符合主要客群需求的產品", "優化品牌訊息以吸引核心受眾"];
 }
 
-// 添加调试端点
+// 導入診斷工具
+import { checkOpenAICredentials, testOpenAICompletion, checkEnvironment } from './server/services/diagnostics.js';
+
+// 添加增強的調試和診斷端點
 app.get('/api/debug/status', (req, res) => {
   const hasApiKey = !!process.env.OPENAI_API_KEY;
   res.json({
@@ -597,6 +600,47 @@ app.get('/api/debug/status', (req, res) => {
     openai_api_key_prefix: hasApiKey ? process.env.OPENAI_API_KEY.substring(0, 5) + '...' : null,
     openai_api_key_length: hasApiKey ? process.env.OPENAI_API_KEY.length : 0
   });
+});
+
+// OpenAI API 診斷端點
+app.get('/api/debug/openai', async (req, res) => {
+  try {
+    console.log('運行 OpenAI API 診斷...');
+    
+    // 收集環境信息
+    const envInfo = checkEnvironment();
+    console.log('環境信息:', envInfo);
+    
+    // 檢查 API 金鑰
+    console.log('檢查 API 金鑰...');
+    const credentialsCheck = await checkOpenAICredentials();
+    
+    // 只有當憑證有效時才測試完成 API
+    let completionTest = { status: 'skipped', message: 'API 金鑰無效，跳過完成測試' };
+    if (credentialsCheck.isValid) {
+      console.log('API 金鑰有效，測試 OpenAI 完成 API...');
+      completionTest = await testOpenAICompletion();
+    }
+    
+    // 返回詳細診斷報告
+    res.json({
+      timestamp: new Date().toISOString(),
+      environment: envInfo,
+      credentials: credentialsCheck,
+      completion: completionTest
+    });
+  } catch (error) {
+    console.error('運行診斷時發生錯誤:', error);
+    res.status(500).json({
+      status: 'error',
+      message: '運行診斷時發生錯誤',
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: process.env.NODE_ENV === 'production' ? null : error.stack
+      }
+    });
+  }
 });
 
 // 啟動服務器
