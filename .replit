@@ -11,9 +11,21 @@ language = "nodejs"
 
 [deployment]
 deploymentTarget = "static"
-build = ["npm", "run", "build"]
+build = ["sh", "-c", "npm run build"]
 publicDir = "dist"
+run = ["sh", "-c", "npm run start"]
 
 [[ports]]
 localPort = 5173
 externalPort = 80
+
+[workflows]
+runButton = "Start Dev Server"
+
+[[workflows.workflow]]
+name = "Start Dev Server"
+author = 39030242
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install && npm run dev"

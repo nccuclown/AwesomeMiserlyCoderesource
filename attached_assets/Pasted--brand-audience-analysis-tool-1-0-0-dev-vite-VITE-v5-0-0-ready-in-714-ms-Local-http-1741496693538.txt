@@ -1,0 +1,511 @@
+> brand-audience-analysis-tool@1.0.0 dev
+> vite
+
+
+  VITE v5.0.0  ready in 714 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://172.31.128.7:5173/
+  ➜  press h + enter to show help
+5:03:42 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x3)
+5:03:52 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x4)
+5:03:52 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x5)
+5:03:55 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x7)
+5:03:58 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x9)
+5:03:59 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x11)
+5:03:59 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x14)
+5:03:59 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x17)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x23)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x29)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x30)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x31)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x32)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x33)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x34)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x35)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x36)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x37)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x38)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x39)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x40)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x41)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x42)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x43)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x44)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x45)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x46)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x47)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x48)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x49)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x50)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x51)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x52)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x53)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x54)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x55)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x56)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x57)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x58)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x59)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x60)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x61)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x62)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x63)
+5:04:00 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x64)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x65)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x66)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x67)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x68)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x69)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x70)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x71)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x72)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x73)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x74)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x75)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x76)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x77)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x78)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x79)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x80)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x81)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x82)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x83)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x84)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x85)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x86)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x87)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x88)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x89)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x90)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x91)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x92)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x93)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x94)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x95)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x96)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x97)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x98)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x99)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x100)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x101)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x102)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x103)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x104)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x105)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x106)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x107)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x108)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x109)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x110)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x111)
+5:04:01 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x112)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x113)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x114)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x115)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x116)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x117)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x118)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x119)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x120)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x121)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x122)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x123)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x124)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x125)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x126)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x127)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x128)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x129)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x130)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x131)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x132)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x133)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x134)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x135)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x136)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x137)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x138)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x139)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x140)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x141)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x142)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x143)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x144)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x145)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x146)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x147)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x148)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x149)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x150)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x151)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x152)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x153)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x154)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x155)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x156)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x157)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x158)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x159)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x160)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x161)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x162)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x163)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x164)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x165)
+5:04:02 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x166)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x167)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x168)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x169)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x170)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x171)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x172)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x173)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x174)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x175)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x176)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x177)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x178)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x179)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x180)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x181)
+5:04:03 AM [vite] http proxy error at /api/analyze:
+Error: connect ECONNREFUSED 127.0.0.1:3000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1611:16) (x182)
+
+
+
