@@ -37,9 +37,30 @@ export default function App() {
       formData.append('brandName', brandInfo.name);
       formData.append('brandDescription', brandInfo.description);
       formData.append('productInfo', brandInfo.productInfo);
-      formData.append('genderFile', files.gender);
-      formData.append('ageFile', files.age);
+      
+      // 添加必要的文件
+      if (files.gender) {
+        formData.append('genderFile', files.gender);
+      }
+      
+      if (files.age) {
+        formData.append('ageFile', files.age);
+      }
+      
+      // 添加選填的文件
+      if (files.productPref) {
+        formData.append('productPrefFile', files.productPref);
+      }
+      
+      if (files.timeSeriesGender) {
+        formData.append('timeSeriesGenderFile', files.timeSeriesGender);
+      }
+      
+      if (files.timeSeriesAge) {
+        formData.append('timeSeriesAgeFile', files.timeSeriesAge);
+      }
 
+      // 發送請求
       const response = await fetch('/api/analyze', {
         method: 'POST',
         body: formData
